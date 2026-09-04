@@ -1,6 +1,6 @@
 /**
- * useScrollSpline: Translates scroll progress into 3D Catmull-Rom ski piste coordinates and metrics.
- * Communicates with: SplineCameraController.jsx, SceneContainer.jsx, and useAudioSystem.js.
+ * useScrollSpline: Translates scroll progress into 3D Catmull-Rom ski piste coordinates grounded to alpine terrain.
+ * Communicates with: SplineCameraController.jsx, SceneContainer.jsx, and terrain.js.
  */
 
 'use client';
@@ -8,23 +8,31 @@
 import { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { gsap, ScrollTrigger } from '@/lib/gsap';
+import { getAlpineElevation } from '@/utils/terrain';
+
+const PISTE_WAYPOINTS = [
+  [0, -160],
+  [24, -100],
+  [14, -60],
+  [-26, -10],
+  [-16, 25],
+  [20, 65],
+  [12, 85],
+  [0, 110],
+  [0, 125],
+];
 
 export function useScrollSpline(triggerRef) {
   const uRef = useRef(0.0);
   const velocityRef = useRef(0.0);
 
   const curve = useMemo(() => {
-    const spline = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 52, -160),
-      new THREE.Vector3(24, 40, -100),
-      new THREE.Vector3(14, 34, -60),
-      new THREE.Vector3(-26, 26, -10),
-      new THREE.Vector3(-16, 20, 25),
-      new THREE.Vector3(20, 12, 65),
-      new THREE.Vector3(12, 8, 85),
-      new THREE.Vector3(0, 2.5, 110),
-      new THREE.Vector3(0, 1.2, 125),
-    ]);
+    const points = PISTE_WAYPOINTS.map(([x, z]) => {
+      const y = getAlpineElevation(x, z) + 0.35;
+      return new THREE.Vector3(x, y, z);
+    });
+
+    const spline = new THREE.CatmullRomCurve3(points);
     spline.curveType = 'centripetal';
     spline.arcLengthDivisions = 400;
     return spline;
