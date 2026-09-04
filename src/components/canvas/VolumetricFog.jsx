@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VolumetricFog: Lightweight multi-density procedural alpine mist and cloud volumes.
  * Communicates with: SceneContainer.jsx, MountainSlope.jsx, and terrain.js.
  */
@@ -14,23 +14,27 @@ const FOG_COLOR_VALLEY = '#DDEAF2';
 const FOG_COLOR_MID = '#E5EEF5';
 const FOG_COLOR_SUMMIT = '#F0F5F8';
 
+const Z_MIN = -185;
+const Z_MAX = 155;
+const Z_SPAN = 340;
+
 const FOG_CLUSTERS = [
-  { x: 8, z: 120, radiusX: 32, radiusY: 5.5, radiusZ: 28, opacity: 0.42, zone: 'valley' },
-  { x: -16, z: 105, radiusX: 28, radiusY: 6.0, radiusZ: 24, opacity: 0.38, zone: 'valley' },
-  { x: 22, z: 92, radiusX: 25, radiusY: 4.8, radiusZ: 22, opacity: 0.36, zone: 'valley' },
-  { x: -5, z: 80, radiusX: 30, radiusY: 5.2, radiusZ: 25, opacity: 0.35, zone: 'valley' },
-  { x: -28, z: 68, radiusX: 24, radiusY: 4.5, radiusZ: 20, opacity: 0.32, zone: 'valley' },
-  { x: 18, z: 55, radiusX: 22, radiusY: 4.2, radiusZ: 18, opacity: 0.30, zone: 'valley' },
+  { x: 12, z: 125, radiusX: 34, radiusY: 7.5, radiusZ: 30, opacity: 0.38, zone: 'valley', heightOffset: 7.5 },
+  { x: -18, z: 105, radiusX: 30, radiusY: 8.0, radiusZ: 26, opacity: 0.34, zone: 'valley', heightOffset: 8.0 },
+  { x: 26, z: 88, radiusX: 28, radiusY: 7.0, radiusZ: 24, opacity: 0.32, zone: 'valley', heightOffset: 7.0 },
+  { x: -8, z: 72, radiusX: 32, radiusY: 7.2, radiusZ: 28, opacity: 0.30, zone: 'valley', heightOffset: 7.5 },
+  { x: -30, z: 52, radiusX: 26, radiusY: 6.5, radiusZ: 22, opacity: 0.28, zone: 'valley', heightOffset: 6.5 },
+  { x: 20, z: 35, radiusX: 25, radiusY: 6.2, radiusZ: 20, opacity: 0.26, zone: 'valley', heightOffset: 6.8 },
 
-  { x: -18, z: 20, radiusX: 22, radiusY: 4.0, radiusZ: 18, opacity: 0.24, zone: 'mid' },
-  { x: 25, z: 5, radiusX: 24, radiusY: 4.5, radiusZ: 20, opacity: 0.22, zone: 'mid' },
-  { x: -12, z: -18, radiusX: 20, radiusY: 3.8, radiusZ: 16, opacity: 0.20, zone: 'mid' },
-  { x: 20, z: -38, radiusX: 22, radiusY: 3.5, radiusZ: 18, opacity: 0.18, zone: 'mid' },
-  { x: -24, z: -55, radiusX: 19, radiusY: 3.2, radiusZ: 15, opacity: 0.16, zone: 'mid' },
+  { x: -22, z: 15, radiusX: 24, radiusY: 6.0, radiusZ: 20, opacity: 0.22, zone: 'mid', heightOffset: 8.0 },
+  { x: 28, z: -8, radiusX: 26, radiusY: 6.5, radiusZ: 22, opacity: 0.20, zone: 'mid', heightOffset: 8.5 },
+  { x: -15, z: -32, radiusX: 22, radiusY: 5.8, radiusZ: 18, opacity: 0.18, zone: 'mid', heightOffset: 7.8 },
+  { x: 22, z: -55, radiusX: 24, radiusY: 5.5, radiusZ: 20, opacity: 0.16, zone: 'mid', heightOffset: 7.5 },
+  { x: -25, z: -78, radiusX: 20, radiusY: 5.0, radiusZ: 16, opacity: 0.15, zone: 'mid', heightOffset: 7.2 },
 
-  { x: 15, z: -95, radiusX: 18, radiusY: 3.0, radiusZ: 14, opacity: 0.12, zone: 'summit' },
-  { x: -20, z: -125, radiusX: 16, radiusY: 2.8, radiusZ: 12, opacity: 0.10, zone: 'summit' },
-  { x: 10, z: -150, radiusX: 15, radiusY: 2.5, radiusZ: 12, opacity: 0.08, zone: 'summit' },
+  { x: 18, z: -105, radiusX: 20, radiusY: 4.8, radiusZ: 16, opacity: 0.12, zone: 'summit', heightOffset: 9.0 },
+  { x: -22, z: -135, radiusX: 18, radiusY: 4.2, radiusZ: 14, opacity: 0.10, zone: 'summit', heightOffset: 9.5 },
+  { x: 12, z: -162, radiusX: 16, radiusY: 3.8, radiusZ: 14, opacity: 0.08, zone: 'summit', heightOffset: 10.0 },
 ];
 
 export default function VolumetricFog() {
@@ -42,8 +46,6 @@ export default function VolumetricFog() {
 
   const fogNodes = useMemo(() => {
     return FOG_CLUSTERS.map((cfg, idx) => {
-      const groundY = getAlpineElevation(cfg.x, cfg.z);
-      const elevationY = groundY + cfg.radiusY * 0.65;
       const color =
         cfg.zone === 'valley'
           ? FOG_COLOR_VALLEY
@@ -62,21 +64,22 @@ export default function VolumetricFog() {
       return {
         id: idx,
         baseX: cfg.x,
-        baseY: elevationY,
         baseZ: cfg.z,
         scale: [cfg.radiusX, cfg.radiusY, cfg.radiusZ],
         material,
-        driftSpeed: 0.18 + (idx % 4) * 0.05,
-        driftPhase: idx * 1.4,
+        baseOpacity: cfg.opacity,
+        heightOffset: cfg.heightOffset,
+        speedZ: 0.85 + (idx % 5) * 0.22,
+        driftPhase: idx * 1.5,
       };
     });
   }, []);
 
   const valleySheets = useMemo(() => {
     return [
-      { yOffset: 1.8, z: 110, radius: 48, opacity: 0.28 },
-      { yOffset: 3.5, z: 85, radius: 42, opacity: 0.22 },
-      { yOffset: 5.2, z: 50, radius: 36, opacity: 0.16 },
+      { yOffset: 6.5, z: 110, radius: 52, opacity: 0.22 },
+      { yOffset: 11.0, z: 82, radius: 46, opacity: 0.18 },
+      { yOffset: 16.5, z: 48, radius: 40, opacity: 0.14 },
     ];
   }, []);
 
@@ -84,12 +87,24 @@ export default function VolumetricFog() {
     if (!fogGroupRef.current) return;
     const time = state.clock.elapsedTime;
 
-    fogGroupRef.current.children.forEach((child, i) => {
-      if (child.userData.driftSpeed) {
-        const speed = child.userData.driftSpeed;
-        const phase = child.userData.driftPhase;
-        child.position.x = child.userData.baseX + Math.sin(time * speed + phase) * 2.2;
-        child.position.z = child.userData.baseZ + Math.cos(time * speed * 0.8 + phase) * 1.6;
+    fogGroupRef.current.children.forEach((child) => {
+      if (child.userData.speedZ) {
+        const uData = child.userData;
+        const rawZ = uData.baseZ - Z_MIN + time * uData.speedZ;
+        const currentZ = (rawZ % Z_SPAN) + Z_MIN;
+
+        const edgeDist = Math.min(currentZ - Z_MIN, Z_MAX - currentZ);
+        const fadeFactor = THREE.MathUtils.clamp(edgeDist / 35, 0, 1);
+        child.material.opacity = uData.baseOpacity * fadeFactor;
+
+        const swayX = Math.sin(time * 0.25 + uData.driftPhase) * 5.0;
+        const swayY = Math.sin(time * 0.35 + uData.driftPhase) * 1.6;
+
+        child.position.x = uData.baseX + swayX;
+        child.position.z = currentZ;
+
+        const groundY = getAlpineElevation(child.position.x, currentZ);
+        child.position.y = groundY + uData.heightOffset + swayY;
       }
     });
   });
@@ -101,12 +116,13 @@ export default function VolumetricFog() {
           key={node.id}
           geometry={cloudGeometry}
           material={node.material}
-          position={[node.baseX, node.baseY, node.baseZ]}
           scale={node.scale}
           userData={{
             baseX: node.baseX,
             baseZ: node.baseZ,
-            driftSpeed: node.driftSpeed,
+            baseOpacity: node.baseOpacity,
+            heightOffset: node.heightOffset,
+            speedZ: node.speedZ,
             driftPhase: node.driftPhase,
           }}
         />
