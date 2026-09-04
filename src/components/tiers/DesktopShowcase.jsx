@@ -7,6 +7,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import SceneContainer from '@/components/canvas/SceneContainer';
+import WebGLErrorBoundary from '@/components/canvas/WebGLErrorBoundary';
 import SkiLiftNav from '@/components/ui/SkiLiftNav';
 import AccessibilityOverlay from '@/components/canvas/AccessibilityOverlay';
 import SplatTransition from '@/components/canvas/SplatTransition';
@@ -91,13 +92,15 @@ export function DesktopShowcase() {
   return (
     <div ref={containerRef} className="relative w-full h-[500vh] bg-[#F3F7F9]">
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden">
-        <SceneContainer
-          progress={currentProgress}
-          curve={curve}
-          onSelectCabin={handleSelectCabin}
-          onActivatePhone={handleActivatePhone}
-          onActivateLedger={handleActivateLedger}
-        />
+        <WebGLErrorBoundary>
+          <SceneContainer
+            progress={currentProgress}
+            curve={curve}
+            onSelectCabin={handleSelectCabin}
+            onActivatePhone={handleActivatePhone}
+            onActivateLedger={handleActivateLedger}
+          />
+        </WebGLErrorBoundary>
 
         <AccessibilityOverlay
           onSelectLandmark={handleLandmarkSelect}
