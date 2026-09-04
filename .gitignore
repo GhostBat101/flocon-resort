@@ -16,11 +16,10 @@ node_modules/
 # Documentation and internal specifications
 docs/
 .antigravity/
-
-# Raw reference images and non-public media
-images/
 *.pdf
-*.jfif
+
+# Reference subfolder in images (only ref is ignored)
+images/ref/
 
 # Local environment & sensitive credentials
 .env
