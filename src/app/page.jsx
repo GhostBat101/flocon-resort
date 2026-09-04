@@ -13,6 +13,8 @@ import MobileUtility from '@/components/tiers/MobileUtility';
 import LegacyFallback from '@/components/tiers/LegacyFallback';
 import CookieConsent from '@/components/ui/CookieConsent';
 
+import WebGLErrorBoundary from '@/components/canvas/WebGLErrorBoundary';
+
 const DesktopShowcase = dynamic(() => import('@/components/tiers/DesktopShowcase'), {
   ssr: false,
   loading: () => (
@@ -64,7 +66,11 @@ export default function HomePage() {
         </div>
       )}
 
-      {tier === 'desktop' && <DesktopShowcase />}
+      {tier === 'desktop' && (
+        <WebGLErrorBoundary fallback={<LegacyFallback />}>
+          <DesktopShowcase />
+        </WebGLErrorBoundary>
+      )}
       {tier === 'tablet' && <TabletExperience />}
       {tier === 'mobile' && <MobileUtility />}
       {tier === 'legacy' && <LegacyFallback />}
