@@ -19,7 +19,11 @@ const INITIAL_FORM = {
   cabinId: CABINS[0].id,
 };
 
-export function BookingController({ initialCabinId = CABINS[0].id, onClose }) {
+export function BookingController({
+  initialCabinId = CABINS[0].id,
+  onClose,
+  onLaunchSnowball,
+}) {
   const [formData, setFormData] = useState({
     ...INITIAL_FORM,
     cabinId: initialCabinId,
@@ -28,6 +32,7 @@ export function BookingController({ initialCabinId = CABINS[0].id, onClose }) {
   const [showHotline, setShowHotline] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [isLaunching, setIsLaunching] = useState(false);
 
   const generateBookingCode = () => {
     const dateObj = formData.checkIn ? new Date(formData.checkIn) : new Date();
@@ -36,7 +41,7 @@ export function BookingController({ initialCabinId = CABINS[0].id, onClose }) {
     const dateToken = `${month}${day}`;
     const cabinToken = formData.cabinId.replace('chalet-', '').substring(0, 4).toUpperCase();
     const nameToken = formData.fullName
-      ? formData.fullName.split(' ').map((n) => n[0]).join('').substring(0, 3).toUpperCase()
+      ? formData.fullName.split(/[\s\-]+/).map((n) => n[0]).join('').substring(0, 3).toUpperCase()
       : 'GST';
     const randomHash = Math.random().toString(36).substring(2, 5).toUpperCase();
     return `FLC-${dateToken}-${cabinToken}-${nameToken}-${randomHash}`;
@@ -51,14 +56,23 @@ export function BookingController({ initialCabinId = CABINS[0].id, onClose }) {
     e.preventDefault();
     const code = generateBookingCode();
     setGeneratedCode(code);
-    setInquirySubmitted(true);
+    setIsLaunching(true);
+
+    if (onLaunchSnowball) {
+      onLaunchSnowball();
+    }
 
     const selectedCabin = CABINS.find((c) => c.id === formData.cabinId) || CABINS[0];
     const emailSubject = `Reservation Inquiry: ${selectedCabin.name} (${code})`;
     const emailBody = `Hello Flocon Alpine Host,\n\nI would like to request a reservation booking for ${selectedCabin.name}.\n\nMy Details & Coordinates:\n-----------------------------------------\nBooking Code : ${code}\nFull Name    : ${formData.fullName}\nEmail        : ${formData.email}\nCheck-In     : ${formData.checkIn}\nCheck-Out    : ${formData.checkOut}\nGuests       : ${formData.guests}\nChalet       : ${selectedCabin.name} (${selectedCabin.altitude})\nRate         : €${selectedCabin.basePrice} / night\n\nI understand that my booking is dependent on host availability and that our alpine host will call or email back within 4 hours to verify.\n\nWarm regards,\n${formData.fullName}`;
 
-    confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
-    window.location.href = `mailto:${RESORT_FACTS.dummyEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
+
+    setTimeout(() => {
+      setIsLaunching(false);
+      setInquirySubmitted(true);
+      window.location.href = `mailto:${RESORT_FACTS.dummyEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    }, 700);
   };
 
   const handleHotlineOpen = () => {
@@ -76,7 +90,24 @@ export function BookingController({ initialCabinId = CABINS[0].id, onClose }) {
   };
 
   return (
-    <div className="w-full max-w-lg p-6 sm:p-8 rounded-2xl bg-[#F3F7F9]/90 backdrop-blur-xl border border-white/60 shadow-2xl text-[#2D4A43] font-body relative">
+    <div className="w-full max-w-lg p-6 sm:p-8 rounded-2xl bg-[#F3F7F9]/90 backdrop-blur-xl border border-white/60 shadow-2xl text-[#2D4A43] font-body relative overflow-hidden">
+      {isLaunching && (
+        <div className="absolute inset-0 z-20 rounded-2xl bg-[#2D4A43]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-[#F3F7F9]">
+          <div className="relative mb-4 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-white shadow-2xl animate-ping opacity-60" />
+            <div className="absolute w-14 h-14 rounded-full bg-gradient-to-tr from-[#D6E4EB] to-white border-2 border-white/80 shadow-inner animate-bounce flex items-center justify-center">
+              <Mail className="w-6 h-6 text-[#2D4A43]" />
+            </div>
+          </div>
+          <p className="font-headline font-black text-xl text-white mb-1">
+            Launching Snowball...
+          </p>
+          <p className="font-label text-xs uppercase tracking-wider text-[#FFB040]">
+            Packing inquiry code {generatedCode}
+          </p>
+        </div>
+      )}
+
       {onClose && (
         <button
           type="button"
