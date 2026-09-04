@@ -17,6 +17,7 @@ import ChaletMarker from './ChaletMarker';
 import ChairliftLine from './ChairliftLine';
 import EnvironmentLighting from './EnvironmentLighting';
 import SplineCameraController from './SplineCameraController';
+import { isWebGLAvailable } from '@/utils/webgl';
 import { CABINS } from '@/data/cabins';
 
 export default function SceneContainer({
@@ -27,10 +28,19 @@ export default function SceneContainer({
   onActivateLedger,
 }) {
   const [mounted, setMounted] = useState(false);
+  const [hasWebGL, setHasWebGL] = useState(true);
 
   useEffect(() => {
+    if (!isWebGLAvailable()) {
+      setHasWebGL(false);
+      return;
+    }
     setMounted(true);
   }, []);
+
+  if (!hasWebGL) {
+    return null;
+  }
 
   if (!mounted) {
     return (
@@ -52,7 +62,8 @@ export default function SceneContainer({
         dpr={[1, 1.8]}
         gl={{
           antialias: true,
-          powerPreference: 'high-performance',
+          powerPreference: 'default',
+          failIfMajorPerformanceCaveat: false,
           stencil: false,
           depth: true,
           toneMapping: THREE.ACESFilmicToneMapping,
