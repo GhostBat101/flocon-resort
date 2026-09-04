@@ -1,3 +1,8 @@
+/**
+ * TestScene: Three.js/R3F low-poly alpine mountain landscape with snowfall and orbiting snowball.
+ * Communicates with: SceneContainer.jsx.
+ */
+
 'use client';
 
 import React, { useRef, useMemo } from 'react';
@@ -5,16 +10,13 @@ import { useFrame } from '@react-three/fiber';
 import { Float, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Low-poly Pine Tree Component
 function PineTree({ position = [0, 0, 0], scale = 1 }) {
   return (
     <group position={position} scale={scale}>
-      {/* Trunk */}
       <mesh position={[0, 0.4, 0]}>
         <cylinderGeometry args={[0.15, 0.2, 0.8, 5]} />
         <meshStandardMaterial color="#5C4033" roughness={0.9} flatShading />
       </mesh>
-      {/* Foliage Layers */}
       <mesh position={[0, 1.1, 0]}>
         <coneGeometry args={[0.9, 1.2, 6]} />
         <meshStandardMaterial color="#2D4A43" roughness={0.8} flatShading />
@@ -31,7 +33,6 @@ function PineTree({ position = [0, 0, 0], scale = 1 }) {
   );
 }
 
-// Snowfall Particles
 function Snowfall({ count = 250 }) {
   const pointsRef = useRef();
   
@@ -123,7 +124,6 @@ export default function TestScene() {
 
       <Snowfall count={280} />
 
-      {/* Main Mountain Peak Cluster */}
       <group ref={mountainRef} position={[0, -2, 0]}>
         <mesh position={[0, 2.5, 0]}>
           <coneGeometry args={[4.5, 5.5, 7]} />
@@ -148,7 +148,6 @@ export default function TestScene() {
         <PineTree position={[-3.2, 0.6, -2.0]} scale={0.75} />
       </group>
 
-      {/* Orbiting Low-Poly Snowball */}
       <group ref={snowballGroupRef} position={[0, 0.5, 0]}>
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.8}>
           <mesh
