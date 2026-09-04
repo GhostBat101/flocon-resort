@@ -1,7 +1,8 @@
 /**
- * Global Styles: Tailwind directives, typography imports, design tokens, and glassmorphism utilities.
+ * Global Styles: Tailwind directives, fluid typography classes, and high-contrast glassmorphism tokens.
  * Communicates with: layout.jsx, tailwind.config.js, and page.jsx.
  */
+
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 @tailwind base;
@@ -25,8 +26,40 @@ body {
 }
 
 .glass-panel {
-  background: rgba(243, 247, 249, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(243, 247, 249, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.flocon-display-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 900;
+  font-size: clamp(2.5rem, 1.2rem + 5.2vw, 6.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.flocon-section-header {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 800;
+  font-size: clamp(1.8rem, 1.1rem + 3.1vw, 3.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.flocon-body-copy {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.95rem, 0.85rem + 0.45vw, 1.15rem);
+  line-height: 1.6;
+}
+
+.flocon-label {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: clamp(0.65rem, 0.6rem + 0.2vw, 0.8rem);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
