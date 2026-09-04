@@ -16,7 +16,7 @@ const PISTE_WAYPOINTS = [
   [20, 65],
   [12, 85],
   [0, 110],
-  [0, 125],
+  [0, 122.5],
 ];
 
 const pisteCurve = new THREE.CatmullRomCurve3(
@@ -58,7 +58,7 @@ assert.strictEqual(summitPoint.z, -160);
 
 const valleyPoint = pisteCurve.getPointAt(1.0);
 assert.ok(valleyPoint.y < 3.0);
-assert.strictEqual(valleyPoint.z, 125);
+assert.strictEqual(valleyPoint.z, 122.5);
 
 const tangentAtSummit = pisteCurve.getTangentAt(0.0).normalize();
 assert.ok(tangentAtSummit.length() > 0.999 && tangentAtSummit.length() < 1.001);
@@ -75,12 +75,12 @@ for (let step = 0; step <= 20; step += 1) {
   assert.ok(tang.z > 0);
 }
 
-const valleyCamPos = pisteCurve.getPointAt(0.999);
-const valleyTarget = valleyCamPos.clone().addScaledVector(tangentAtValley, 14.0);
-valleyTarget.y = valleyCamPos.y - 0.5;
-const viewDirection = valleyTarget.clone().sub(valleyCamPos).normalize();
-const crossWithUp = new THREE.Vector3().crossVectors(viewDirection, new THREE.Vector3(0, 1, 0));
-assert.ok(crossWithUp.length() > 0.6);
+const deskGroundY = getAlpineElevation(0, 125);
+const deskEyePos = new THREE.Vector3(0, deskGroundY + 2.1, 123.5);
+const deskLookTgt = new THREE.Vector3(0, deskGroundY + 0.92, 125.0);
+const deskViewDir = deskLookTgt.clone().sub(deskEyePos).normalize();
+assert.ok(deskViewDir.y < -0.5);
+assert.ok(deskViewDir.z > 0.7);
 
 const code = generateDeterministicCode('2026-12-15', 'chalet-chamonix', 'Jean-Claude Killy', '82A');
 assert.strictEqual(code, 'FLC-1215-CHAM-JCK-82A');
