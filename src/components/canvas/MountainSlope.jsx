@@ -1,26 +1,43 @@
 /**
  * MountainSlope: Grand continuous snowy mountain terrain featuring a groomed zig-zag ski piste ribbon and boundary poles.
- * Communicates with: SceneContainer.jsx, useScrollSpline.js, and Forest.jsx.
+ * Communicates with: SceneContainer.jsx, useScrollSpline.js, Forest.jsx, and terrain.js.
  */
 
 'use client';
 
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
+import { getAlpineElevation } from '@/utils/terrain';
 
 const SNOW_COLOR = '#F3F7F9';
 const PISTE_COLOR = '#E0EDF4';
-const TRACK_LINE_COLOR = '#C2D8E3';
 const ROCK_COLOR = '#8FA3AE';
 const POLE_COLOR = '#263238';
 const FLAG_COLOR = '#FF8F00';
 
 export default function MountainSlope({ curve }) {
+  const terrainGeometry = useMemo(() => {
+    const geo = new THREE.PlaneGeometry(300, 380, 72, 96);
+    geo.rotateX(-Math.PI / 2);
+    geo.translate(0, 0, -20);
+
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i += 1) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      const y = getAlpineElevation(x, z);
+      pos.setY(i, y);
+    }
+
+    geo.computeVertexNormals();
+    return geo;
+  }, []);
+
   const pisteGeometry = useMemo(() => {
     if (!curve) return null;
 
     const divisions = 240;
-    const pisteHalfWidth = 5.2;
+    const pisteHalfWidth = 5.4;
     const positions = [];
     const uvs = [];
     const indices = [];
@@ -32,14 +49,16 @@ export default function MountainSlope({ curve }) {
       const tangent = curve.getTangentAt(t).normalize();
       const binormal = new THREE.Vector3().crossVectors(tangent, upVector).normalize();
 
-      const left = new THREE.Vector3().copy(point).addScaledVector(binormal, pisteHalfWidth);
-      const right = new THREE.Vector3().copy(point).addScaledVector(binormal, -pisteHalfWidth);
+      const leftX = point.x + binormal.x * pisteHalfWidth;
+      const leftZ = point.z + binormal.z * pisteHalfWidth;
+      const leftY = getAlpineElevation(leftX, leftZ) + 0.05;
 
-      left.y += 0.08;
-      right.y += 0.08;
+      const rightX = point.x - binormal.x * pisteHalfWidth;
+      const rightZ = point.z - binormal.z * pisteHalfWidth;
+      const rightY = getAlpineElevation(rightX, rightZ) + 0.05;
 
-      positions.push(left.x, left.y, left.z);
-      positions.push(right.x, right.y, right.z);
+      positions.push(leftX, leftY, leftZ);
+      positions.push(rightX, rightY, rightZ);
 
       uvs.push(0, t * 20);
       uvs.push(1, t * 20);
@@ -72,15 +91,20 @@ export default function MountainSlope({ curve }) {
       const tangent = curve.getTangentAt(t).normalize();
       const binormal = new THREE.Vector3().crossVectors(tangent, upVector).normalize();
 
-      const leftPos = new THREE.Vector3().copy(point).addScaledVector(binormal, 5.8);
-      const rightPos = new THREE.Vector3().copy(point).addScaledVector(binormal, -5.8);
+      const leftX = point.x + binormal.x * 6.0;
+      const leftZ = point.z + binormal.z * 6.0;
+      const leftY = getAlpineElevation(leftX, leftZ);
+
+      const rightX = point.x - binormal.x * 6.0;
+      const rightZ = point.z - binormal.z * 6.0;
+      const rightY = getAlpineElevation(rightX, rightZ);
 
       poles.push({
-        position: [leftPos.x, leftPos.y + 0.9, leftPos.z],
+        position: [leftX, leftY + 0.7, leftZ],
         side: 'left',
       });
       poles.push({
-        position: [rightPos.x, rightPos.y + 0.9, rightPos.z],
+        position: [rightX, rightY + 0.7, rightZ],
         side: 'right',
       });
     }
@@ -88,26 +112,9 @@ export default function MountainSlope({ curve }) {
     return poles;
   }, [curve]);
 
-  const terrainGeometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(280, 420, 48, 64);
-    geo.rotateX(-Math.PI / 2);
-
-    const pos = geo.attributes.position;
-    for (let i = 0; i < pos.count; i += 1) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-      const slopeY = 54 - ((z + 180) / 320) * 52;
-      const rollingNoise = Math.sin(x * 0.04) * 3.5 + Math.cos(z * 0.03) * 2.8;
-      pos.setY(i, Math.max(0, slopeY + rollingNoise));
-    }
-
-    geo.computeVertexNormals();
-    return geo;
-  }, []);
-
   return (
     <group>
-      <mesh geometry={terrainGeometry} position={[0, -0.4, -20]} receiveShadow>
+      <mesh geometry={terrainGeometry} receiveShadow>
         <meshStandardMaterial
           color={SNOW_COLOR}
           roughness={0.92}
