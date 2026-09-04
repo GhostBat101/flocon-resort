@@ -1,16 +1,21 @@
 /**
  * SplineCameraController: First-person skier camera gliding down the winding alpine piste.
- * Communicates with: SceneContainer.jsx and useScrollSpline.js.
+ * Communicates with: SceneContainer.jsx, useScrollSpline.js, and terrain.js.
  */
 
 'use client';
 
 import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
+import { getAlpineElevation } from '@/utils/terrain';
 
 const SCRATCH_POS = new THREE.Vector3();
 const SCRATCH_TGT = new THREE.Vector3();
+const SKI_LOOK_TGT = new THREE.Vector3();
+const SKI_CAM_POS = new THREE.Vector3();
+const DESK_EYE_POS = new THREE.Vector3();
+const DESK_LOOK_TGT = new THREE.Vector3();
 const TARGET_CAM_POS = new THREE.Vector3();
 const TARGET_ROT_MAT = new THREE.Matrix4();
 const TARGET_QUAT = new THREE.Quaternion();
@@ -35,14 +40,24 @@ export default function SplineCameraController({ curve, targetProgress = 0 }) {
     curve.getPointAt(clampedU, SCRATCH_POS);
 
     const tangent = curve.getTangentAt(clampedU).normalize();
-    SCRATCH_TGT.copy(SCRATCH_POS).addScaledVector(tangent, 14.0);
-    SCRATCH_TGT.y = SCRATCH_POS.y - 0.5;
+    SKI_LOOK_TGT.copy(SCRATCH_POS).addScaledVector(tangent, 14.0);
+    SKI_LOOK_TGT.y = SCRATCH_POS.y - 0.5;
 
-    TARGET_CAM_POS.set(
+    SKI_CAM_POS.set(
       SCRATCH_POS.x,
       SCRATCH_POS.y + 2.4,
       SCRATCH_POS.z
     );
+
+    const deskT = THREE.MathUtils.clamp((clampedU - 0.85) / 0.15, 0, 1);
+    const deskWeight = deskT * deskT * (3 - 2 * deskT);
+
+    const deskGroundY = getAlpineElevation(0, 125);
+    DESK_EYE_POS.set(0, deskGroundY + 2.1, 123.5);
+    DESK_LOOK_TGT.set(0, deskGroundY + 0.92, 125.0);
+
+    TARGET_CAM_POS.lerpVectors(SKI_CAM_POS, DESK_EYE_POS, deskWeight);
+    SCRATCH_TGT.lerpVectors(SKI_LOOK_TGT, DESK_LOOK_TGT, deskWeight);
 
     state.camera.position.lerp(TARGET_CAM_POS, THREE.MathUtils.clamp(safeDelta * 8, 0, 1));
 
