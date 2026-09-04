@@ -29,6 +29,11 @@ export function ContentModal({ cabinId, onClose, onBook }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-cabin-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && onClose) {
+          onClose();
+        }
+      }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/30 backdrop-blur-sm animate-fadeIn"
     >
       <div className="w-full max-w-xl p-6 sm:p-8 rounded-3xl bg-[#F3F7F9]/90 backdrop-blur-2xl border border-white/80 shadow-2xl text-[#2D4A43] font-body relative space-y-6">
