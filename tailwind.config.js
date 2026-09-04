@@ -1,4 +1,7 @@
-/** @type {import('tailwindcss').Config} */
+/**
+ * Tailwind Configuration: Design tokens, color palette, and typography mappings for Flocon.
+ * Communicates with: globals.css, layout.jsx, and all UI components.
+ */
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -18,9 +21,11 @@ module.exports = {
         },
       },
       fontFamily: {
-        display: ['Syne', 'sans-serif'],
-        heading: ['Plus Jakarta Sans', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        headline: ['"Playfair Display"', 'Georgia', 'serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        body: ['"Space Grotesk"', 'sans-serif'],
+        label: ['"Space Mono"', 'monospace'],
+        mono: ['"Space Mono"', 'monospace'],
       },
     },
   },
