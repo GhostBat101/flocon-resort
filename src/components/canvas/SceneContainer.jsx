@@ -1,18 +1,15 @@
 /**
- * SceneContainer: R3F Canvas wrapper managing 3D viewport mounting, scene graph, and postprocessing.
- * Communicates with: DesktopShowcase.jsx, Mountain.jsx, Forest.jsx, and ChairliftLine.jsx.
+ * SceneContainer: R3F Canvas wrapper managing 3D ski piste viewport, atmospheric fog, and lighting.
+ * Communicates with: DesktopShowcase.jsx, MountainSlope.jsx, Forest.jsx, and SplineCameraController.jsx.
  */
 
 'use client';
 
 import React, { Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import Mountain from './Mountain';
+import MountainSlope from './MountainSlope';
 import Forest from './Forest';
-import Snowball from './Snowball';
-import ShadowPlane from './ShadowPlane';
 import Snowfall from './Snowfall';
 import BookingDesk from './BookingDesk';
 import ChaletMarker from './ChaletMarker';
@@ -24,7 +21,6 @@ import { CABINS } from '@/data/cabins';
 export default function SceneContainer({
   progress = 0,
   curve,
-  getMetrics,
   onSelectCabin,
   onActivatePhone,
   onActivateLedger,
@@ -51,33 +47,27 @@ export default function SceneContainer({
   return (
     <div className="relative w-full h-full">
       <Canvas
-        camera={{ position: [0, 42, 22], fov: 45 }}
+        camera={{ position: [0, 54, -160], fov: 58, near: 0.1, far: 450 }}
         dpr={[1, 1.8]}
         gl={{
-          antialias: false,
+          antialias: true,
           powerPreference: 'high-performance',
           stencil: false,
           depth: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.05,
+          toneMappingExposure: 1.08,
         }}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
+        <fogExp2 attach="fog" args={['#E0EBF2', 0.0085]} />
         <Suspense fallback={null}>
           <EnvironmentLighting progress={progress} />
           {curve && <SplineCameraController curve={curve} targetProgress={progress} />}
 
-          <Mountain />
-          <Forest count={400} />
+          <MountainSlope curve={curve} />
+          <Forest curve={curve} count={550} />
           <ChairliftLine />
-          <Snowfall count={380} />
-
-          {getMetrics && (
-            <>
-              <Snowball progress={progress} getMetrics={getMetrics} />
-              <ShadowPlane progress={progress} getMetrics={getMetrics} />
-            </>
-          )}
+          <Snowfall count={360} />
 
           {CABINS.map((cabin) => (
             <ChaletMarker
@@ -88,18 +78,10 @@ export default function SceneContainer({
           ))}
 
           <BookingDesk
+            position={[0, 0.8, 125]}
             onActivatePhone={onActivatePhone}
             onActivateLedger={onActivateLedger}
           />
-
-          <EffectComposer disableNormalPass multisampling={4}>
-            <Bloom
-              mipmapBlur
-              intensity={0.9}
-              luminanceThreshold={0.94}
-              luminanceSmoothing={0.08}
-            />
-          </EffectComposer>
         </Suspense>
       </Canvas>
     </div>
