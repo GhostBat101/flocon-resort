@@ -1,12 +1,13 @@
 /**
- * Forest: High-performance instanced pine forest flanking the ski piste corridor.
- * Communicates with: SceneContainer.jsx, MountainSlope.jsx, and useScrollSpline.js.
+ * Forest: High-performance instanced pine forest flanking the ski piste corridor grounded to alpine terrain.
+ * Communicates with: SceneContainer.jsx, MountainSlope.jsx, useScrollSpline.js, and terrain.js.
  */
 
 'use client';
 
 import React, { useRef, useMemo, useLayoutEffect } from 'react';
 import * as THREE from 'three';
+import { getAlpineElevation } from '@/utils/terrain';
 
 const DUMMY = new THREE.Object3D();
 const SCRATCH_COLOR = new THREE.Color();
@@ -53,9 +54,9 @@ export default function Forest({ curve, count = 550 }) {
         z = (Math.random() - 0.5) * 320;
       }
 
-      const slopeY = 54 - ((z + 180) / 320) * 52;
-      const rollingNoise = Math.sin(x * 0.04) * 3.5 + Math.cos(z * 0.03) * 2.8;
-      y = Math.max(0.2, slopeY + rollingNoise - 0.2);
+      x = Math.max(-135, Math.min(135, x));
+      z = Math.max(-180, Math.min(145, z));
+      y = getAlpineElevation(x, z) - 0.15;
 
       const scale = 0.85 + Math.random() * 1.1;
       const rotY = Math.random() * Math.PI * 2;
