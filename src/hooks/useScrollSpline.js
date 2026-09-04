@@ -19,7 +19,7 @@ const PISTE_WAYPOINTS = [
   [20, 65],
   [12, 85],
   [0, 110],
-  [0, 125],
+  [0, 122.5],
 ];
 
 export function useScrollSpline(triggerRef) {
