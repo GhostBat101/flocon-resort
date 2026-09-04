@@ -25,7 +25,14 @@ export function DesktopShowcase() {
   const [currentProgress, setCurrentProgress] = useState(0);
 
   const { curve, uRef, velocityRef, getSnowballMetrics } = useScrollSpline(containerRef);
-  const { isMuted, toggleMute, updateMotion, playTelephoneRing, playSnowSplat } = useAudioSystem();
+  const {
+    isMuted,
+    toggleMute,
+    updateMotion,
+    playTelephoneRing,
+    playSnowSplat,
+    playSnowballLaunch,
+  } = useAudioSystem();
 
   useEffect(() => {
     let animationFrameId;
@@ -155,6 +162,7 @@ export function DesktopShowcase() {
             <BookingController
               initialCabinId={activeModalCabin || 'chalet-chamonix'}
               onClose={() => setShowBookingDesk(false)}
+              onLaunchSnowball={playSnowballLaunch}
             />
           </div>
         )}
