@@ -1,3 +1,8 @@
+/**
+ * SceneContainer: R3F Canvas wrapper managing 3D viewport mounting and WebGL fallbacks.
+ * Communicates with: TestScene.jsx, page.jsx, and globals.css.
+ */
+
 'use client';
 
 import React, { Suspense, useState, useEffect } from 'react';
