@@ -6,6 +6,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { isWebGLAvailable } from '@/utils/webgl';
 
 export function useDeviceTier() {
   const [tier, setTier] = useState('loading');
@@ -18,9 +19,7 @@ export function useDeviceTier() {
         return;
       }
 
-      const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-      if (!gl) {
+      if (!isWebGLAvailable()) {
         setTier('legacy');
         return;
       }
