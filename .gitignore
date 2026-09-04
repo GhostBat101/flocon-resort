@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Documentation and internal specifications
+docs/
+.antigravity/
+
+# Raw reference images and non-public media
+images/
+*.pdf
+*.jfif
+
+# Local environment & sensitive credentials
+.env
+.env*.local
+.env.*
+*.pem
+*.key
+*.cert
+
+# Vercel & CI artifacts
+.vercel
+*.log
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Temporary files
+scratch/
+*.temp.*
+
