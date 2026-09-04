@@ -24,7 +24,7 @@ export function DesktopShowcase() {
   const [splatActive, setSplatActive] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(0);
 
-  const { curve, uRef, velocityRef, getSnowballMetrics } = useScrollSpline(containerRef);
+  const { curve, uRef, velocityRef } = useScrollSpline(containerRef);
   const {
     isMuted,
     toggleMute,
@@ -94,7 +94,6 @@ export function DesktopShowcase() {
         <SceneContainer
           progress={currentProgress}
           curve={curve}
-          getMetrics={getSnowballMetrics}
           onSelectCabin={handleSelectCabin}
           onActivatePhone={handleActivatePhone}
           onActivateLedger={handleActivateLedger}
@@ -137,7 +136,7 @@ export function DesktopShowcase() {
             {currentProgress < 0.35 ? 'Summit Crags • 2,800m' : currentProgress < 0.75 ? 'Mid-Slope Forest • 2,100m' : 'Valley Village • 1,200m'}
           </p>
           <p className="font-body text-xs text-[#2D4A43]/80 mt-1">
-            Scroll down to roll snowball • Click chalets or phone to interact
+            Scroll to carve down the mountain • Click chalets or phone to interact
           </p>
         </div>
 
