@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import MountainSlope from './MountainSlope';
 import Forest from './Forest';
 import Snowfall from './Snowfall';
+import VolumetricFog from './VolumetricFog';
 import BookingDesk from './BookingDesk';
 import ChaletMarker from './ChaletMarker';
 import ChairliftLine from './ChairliftLine';
@@ -66,6 +67,7 @@ export default function SceneContainer({
 
           <MountainSlope curve={curve} />
           <Forest curve={curve} count={550} />
+          <VolumetricFog />
           <ChairliftLine />
           <Snowfall count={360} />
 
@@ -78,7 +80,7 @@ export default function SceneContainer({
           ))}
 
           <BookingDesk
-            position={[0, 0.8, 125]}
+            position={[0, 1.2, 125]}
             onActivatePhone={onActivatePhone}
             onActivateLedger={onActivateLedger}
           />
