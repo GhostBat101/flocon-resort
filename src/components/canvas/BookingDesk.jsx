@@ -24,7 +24,11 @@ function PhoneModel() {
   return <primitive object={scene} scale={[0.42, 0.42, 0.42]} />;
 }
 
-export default function BookingDesk({ onActivatePhone, onActivateLedger }) {
+export default function BookingDesk({
+  position = [0, 0.8, 125],
+  onActivatePhone,
+  onActivateLedger,
+}) {
   const phoneRef = useRef();
   const [hoveredPhone, setHoveredPhone] = useState(false);
 
@@ -37,7 +41,7 @@ export default function BookingDesk({ onActivatePhone, onActivateLedger }) {
   });
 
   return (
-    <group position={[0, 0.4, 0]}>
+    <group position={position}>
       <DeskModel />
 
       <group
@@ -62,7 +66,17 @@ export default function BookingDesk({ onActivatePhone, onActivateLedger }) {
         </mesh>
       </group>
 
-      <pointLight position={[0, 1.6, -0.4]} color={GOLD_ACCENT_COLOR} intensity={1.8} distance={6} />
+      <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[2.8, 3.2, 24]} />
+        <meshBasicMaterial
+          color={GOLD_ACCENT_COLOR}
+          transparent
+          opacity={0.65}
+          depthWrite={false}
+        />
+      </mesh>
+
+      <pointLight position={[0, 1.8, -0.4]} color={GOLD_ACCENT_COLOR} intensity={2.2} distance={8} />
     </group>
   );
 }
