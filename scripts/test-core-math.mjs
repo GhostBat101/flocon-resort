@@ -69,10 +69,23 @@ const tangentAtValley = pisteCurve.getTangentAt(0.999).normalize();
 assert.ok(tangentAtValley.length() > 0.999 && tangentAtValley.length() < 1.001);
 assert.ok(Math.abs(tangentAtValley.y) < Math.abs(tangentAtSummit.y));
 
+for (let step = 0; step <= 20; step += 1) {
+  const u = Math.min(0.999, step / 20);
+  const tang = pisteCurve.getTangentAt(u).normalize();
+  assert.ok(tang.z > 0);
+}
+
+const valleyCamPos = pisteCurve.getPointAt(0.999);
+const valleyTarget = valleyCamPos.clone().addScaledVector(tangentAtValley, 14.0);
+valleyTarget.y = valleyCamPos.y - 0.5;
+const viewDirection = valleyTarget.clone().sub(valleyCamPos).normalize();
+const crossWithUp = new THREE.Vector3().crossVectors(viewDirection, new THREE.Vector3(0, 1, 0));
+assert.ok(crossWithUp.length() > 0.6);
+
 const code = generateDeterministicCode('2026-12-15', 'chalet-chamonix', 'Jean-Claude Killy', '82A');
 assert.strictEqual(code, 'FLC-1215-CHAM-JCK-82A');
 
 const codeRegex = /^FLC-\d{4}-[A-Z]{4}-[A-Z]{3}-[A-Z0-9]{3}$/;
 assert.ok(codeRegex.test(code));
 
-console.log('✅ All terrain elevation models, piste tangents, and booking generators verified successfully.');
+console.log('✅ All terrain elevation models, camera stability matrices, and booking generators verified successfully.');
