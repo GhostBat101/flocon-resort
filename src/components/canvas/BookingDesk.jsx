@@ -1,6 +1,6 @@
 /**
- * BookingDesk: Valley mountain base 3D interactive booking desk with phone and ledger.
- * Communicates with: SceneContainer.jsx, BookingController.jsx, and useAudioSystem.js.
+ * BookingDesk: Valley mountain base 3D interactive booking desk with phone, ledger, and snow platform.
+ * Communicates with: SceneContainer.jsx, BookingController.jsx, useAudioSystem.js, and terrain.js.
  */
 
 'use client';
@@ -9,14 +9,16 @@ import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import { getAssetUrl } from '@/utils/assets';
+import { getAlpineElevation } from '@/utils/terrain';
 
 const GOLD_ACCENT_COLOR = '#FFB040';
+const SNOW_PLATFORM_COLOR = '#EBF3F7';
 const DESK_MODEL_PATH = getAssetUrl('/assets/models/booking_desk.glb');
 const PHONE_MODEL_PATH = getAssetUrl('/assets/models/rotary_phone.glb');
 
 function DeskModel() {
   const { scene } = useGLTF(DESK_MODEL_PATH);
-  return <primitive object={scene} position={[0, -0.4, 0]} scale={[0.9, 0.9, 0.9]} />;
+  return <primitive object={scene} position={[0, 0, 0]} scale={[0.9, 0.9, 0.9]} />;
 }
 
 function PhoneModel() {
@@ -25,12 +27,14 @@ function PhoneModel() {
 }
 
 export default function BookingDesk({
-  position = [0, 0.8, 125],
+  position = [0, 1.2, 125],
   onActivatePhone,
   onActivateLedger,
 }) {
   const phoneRef = useRef();
   const [hoveredPhone, setHoveredPhone] = useState(false);
+
+  const groundY = getAlpineElevation(position[0], position[2]);
 
   useFrame((state) => {
     if (phoneRef.current && hoveredPhone) {
@@ -41,8 +45,13 @@ export default function BookingDesk({
   });
 
   return (
-    <group position={position}>
+    <group position={[position[0], groundY, position[2]]}>
       <DeskModel />
+
+      <mesh position={[0, -0.15, 0]} receiveShadow>
+        <cylinderGeometry args={[2.4, 2.8, 0.32, 20]} />
+        <meshStandardMaterial color={SNOW_PLATFORM_COLOR} roughness={0.94} flatShading />
+      </mesh>
 
       <group
         ref={phoneRef}
