@@ -1,3 +1,8 @@
+/**
+ * RootLayout: Base HTML shell and resort metadata configuration for Flocon.
+ * Communicates with: globals.css and child page components.
+ */
+
 import './globals.css';
 
 export const metadata = {
