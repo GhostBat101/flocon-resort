@@ -16,6 +16,10 @@ node_modules/
 # Documentation and internal specifications
 docs/
 .antigravity/
+.agents/
+.agent/
+_agents/
+_agent/
 *.pdf
 
 # Reference subfolder in images (only ref is ignored)
