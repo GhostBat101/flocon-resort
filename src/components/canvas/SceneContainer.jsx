@@ -1,6 +1,6 @@
 /**
  * SceneContainer: R3F Canvas wrapper managing 3D viewport mounting, scene graph, and postprocessing.
- * Communicates with: DesktopShowcase.jsx, Mountain.jsx, and Snowball.jsx.
+ * Communicates with: DesktopShowcase.jsx, Mountain.jsx, Forest.jsx, and ChairliftLine.jsx.
  */
 
 'use client';
@@ -16,6 +16,7 @@ import ShadowPlane from './ShadowPlane';
 import Snowfall from './Snowfall';
 import BookingDesk from './BookingDesk';
 import ChaletMarker from './ChaletMarker';
+import ChairliftLine from './ChairliftLine';
 import EnvironmentLighting from './EnvironmentLighting';
 import SplineCameraController from './SplineCameraController';
 import { CABINS } from '@/data/cabins';
@@ -68,6 +69,7 @@ export default function SceneContainer({
 
           <Mountain />
           <Forest count={400} />
+          <ChairliftLine />
           <Snowfall count={380} />
 
           {getMetrics && (
