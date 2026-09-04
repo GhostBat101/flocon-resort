@@ -5,13 +5,19 @@
 
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
+import { getAssetUrl } from '@/utils/assets';
 
-const WALL_COLOR = '#5C4033';
-const ROOF_SNOW_COLOR = '#F3F7F9';
-const CHIMNEY_COLOR = '#9EBBC9';
 const GLOW_COLOR = '#FFB040';
+const CABIN_MODEL_PATH = getAssetUrl('/assets/models/cozy_cabin.glb');
+
+function CabinModel() {
+  const { scene } = useGLTF(CABIN_MODEL_PATH);
+  const clonedScene = useMemo(() => scene.clone(true), [scene]);
+  return <primitive object={clonedScene} scale={[1.1, 1.1, 1.1]} />;
+}
 
 export default function ChaletMarker({ cabin, onSelect }) {
   const groupRef = useRef();
@@ -34,36 +40,14 @@ export default function ChaletMarker({ cabin, onSelect }) {
       onPointerOut={() => setHovered(false)}
       className="cursor-pointer"
     >
-      <mesh position={[0, 0.9, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2.4, 1.8, 2.8]} />
-        <meshStandardMaterial color={WALL_COLOR} roughness={0.85} flatShading />
-      </mesh>
+      <CabinModel />
 
-      <mesh position={[0, 2.3, 0]} rotation={[0, 0, 0]} castShadow receiveShadow>
-        <coneGeometry args={[2.6, 1.4, 4]} />
-        <meshStandardMaterial color={ROOF_SNOW_COLOR} roughness={0.6} flatShading />
-      </mesh>
-
-      <mesh position={[0.7, 2.2, 0.6]} castShadow>
-        <boxGeometry args={[0.5, 1.2, 0.5]} />
-        <meshStandardMaterial color={CHIMNEY_COLOR} roughness={0.9} flatShading />
-      </mesh>
-
-      <mesh position={[0, 0.8, -1.42]}>
-        <boxGeometry args={[0.7, 1.2, 0.05]} />
-        <meshStandardMaterial color="#3E2723" roughness={0.9} flatShading />
-      </mesh>
-
-      <mesh position={[-1.22, 0.9, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[0.8, 0.6, 0.05]} />
-        <meshStandardMaterial
-          color={GLOW_COLOR}
-          emissive={GLOW_COLOR}
-          emissiveIntensity={hovered ? 2.5 : 1.2}
-          roughness={0.2}
-          flatShading
-        />
-      </mesh>
+      <pointLight
+        position={[0, 1.8, 0]}
+        color={GLOW_COLOR}
+        intensity={hovered ? 3.0 : 1.2}
+        distance={6}
+      />
 
       <mesh
         ref={ringRef}
