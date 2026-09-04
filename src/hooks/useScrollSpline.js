@@ -1,6 +1,6 @@
 /**
- * useScrollSpline: Translates scroll progress into 3D Catmull-Rom spline coordinates and metrics.
- * Communicates with: Snowball.jsx, SceneContainer.jsx, and useAudioSystem.js.
+ * useScrollSpline: Translates scroll progress into 3D Catmull-Rom ski piste coordinates and metrics.
+ * Communicates with: SplineCameraController.jsx, SceneContainer.jsx, and useAudioSystem.js.
  */
 
 'use client';
@@ -12,19 +12,21 @@ import { gsap, ScrollTrigger } from '@/lib/gsap';
 export function useScrollSpline(triggerRef) {
   const uRef = useRef(0.0);
   const velocityRef = useRef(0.0);
-  const previousPosition = useRef(new THREE.Vector3(0, 50, 0));
 
   const curve = useMemo(() => {
     const spline = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 50, 0),
-      new THREE.Vector3(12, 40, -10),
-      new THREE.Vector3(-14, 30, 8),
-      new THREE.Vector3(16, 20, -12),
-      new THREE.Vector3(-8, 10, 14),
-      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 52, -160),
+      new THREE.Vector3(24, 40, -100),
+      new THREE.Vector3(14, 34, -60),
+      new THREE.Vector3(-26, 26, -10),
+      new THREE.Vector3(-16, 20, 25),
+      new THREE.Vector3(20, 12, 65),
+      new THREE.Vector3(12, 8, 85),
+      new THREE.Vector3(0, 2.5, 110),
+      new THREE.Vector3(0, 1.2, 125),
     ]);
     spline.curveType = 'centripetal';
-    spline.arcLengthDivisions = 300;
+    spline.arcLengthDivisions = 400;
     return spline;
   }, []);
 
@@ -55,24 +57,24 @@ export function useScrollSpline(triggerRef) {
     return () => ctx.revert();
   }, [triggerRef]);
 
-  const getSnowballMetrics = (progressValue = uRef.current) => {
+  const getTrackMetrics = (progressValue = uRef.current) => {
     const clampedU = Math.max(0, Math.min(0.999, progressValue));
     const position = curve.getPointAt(clampedU);
     const tangent = curve.getTangentAt(clampedU).normalize();
-    const scale = 1.0 + Math.log1p(clampedU * 1.5) * 1.15;
-    const dist = position.distanceTo(previousPosition.current);
-    previousPosition.current.copy(position);
-    const deltaTheta = dist / (0.5 * scale);
 
     return {
       u: clampedU,
       position,
       tangent,
-      scale,
-      deltaTheta,
       velocity: velocityRef.current,
     };
   };
 
-  return { curve, uRef, velocityRef, getSnowballMetrics };
+  return {
+    curve,
+    uRef,
+    velocityRef,
+    getTrackMetrics,
+    getSnowballMetrics: getTrackMetrics,
+  };
 }
