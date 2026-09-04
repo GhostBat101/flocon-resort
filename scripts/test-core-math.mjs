@@ -1,22 +1,27 @@
 /**
- * test-core-math: Node.js assert-based unit tests for ski piste tangents, descent profile, and booking code generator.
- * Communicates with: useScrollSpline.js, MountainSlope.jsx, and BookingController.jsx.
+ * test-core-math: Node.js assert-based unit tests for terrain heightfield, piste tangents, and booking code generator.
+ * Communicates with: terrain.js, useScrollSpline.js, MountainSlope.jsx, and BookingController.jsx.
  */
 
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
+import { getAlpineElevation } from '../src/utils/terrain.js';
 
-const pisteCurve = new THREE.CatmullRomCurve3([
-  new THREE.Vector3(0, 52, -160),
-  new THREE.Vector3(24, 40, -100),
-  new THREE.Vector3(14, 34, -60),
-  new THREE.Vector3(-26, 26, -10),
-  new THREE.Vector3(-16, 20, 25),
-  new THREE.Vector3(20, 12, 65),
-  new THREE.Vector3(12, 8, 85),
-  new THREE.Vector3(0, 2.5, 110),
-  new THREE.Vector3(0, 1.2, 125),
-]);
+const PISTE_WAYPOINTS = [
+  [0, -160],
+  [24, -100],
+  [14, -60],
+  [-26, -10],
+  [-16, 25],
+  [20, 65],
+  [12, 85],
+  [0, 110],
+  [0, 125],
+];
+
+const pisteCurve = new THREE.CatmullRomCurve3(
+  PISTE_WAYPOINTS.map(([x, z]) => new THREE.Vector3(x, getAlpineElevation(x, z) + 0.35, z))
+);
 pisteCurve.curveType = 'centripetal';
 pisteCurve.arcLengthDivisions = 400;
 
@@ -32,13 +37,28 @@ function generateDeterministicCode(checkInDate, cabinId, fullName, randomSeed = 
   return `FLC-${dateToken}-${cabinToken}-${nameToken}-${randomSeed}`;
 }
 
+const summitElev = getAlpineElevation(0, -160);
+assert.ok(summitElev > 50 && summitElev < 55);
+
+const valleyElev = getAlpineElevation(0, 125);
+assert.ok(valleyElev > 1.0 && valleyElev < 2.5);
+
+const chamonixElev = getAlpineElevation(22, -60);
+assert.ok(Math.abs(chamonixElev - 32.1) < 0.3);
+
+const valaisElev = getAlpineElevation(-24, 25);
+assert.ok(Math.abs(valaisElev - 17.0) < 0.3);
+
+const zermattElev = getAlpineElevation(19, 85);
+assert.ok(Math.abs(zermattElev - 7.2) < 0.3);
+
 const summitPoint = pisteCurve.getPointAt(0.0);
-assert.strictEqual(summitPoint.y, 52);
+assert.ok(summitPoint.y > 50);
 assert.strictEqual(summitPoint.z, -160);
 
 const valleyPoint = pisteCurve.getPointAt(1.0);
-assert.ok(Math.abs(valleyPoint.y - 1.2) < 0.1);
-assert.ok(Math.abs(valleyPoint.z - 125) < 0.1);
+assert.ok(valleyPoint.y < 3.0);
+assert.strictEqual(valleyPoint.z, 125);
 
 const tangentAtSummit = pisteCurve.getTangentAt(0.0).normalize();
 assert.ok(tangentAtSummit.length() > 0.999 && tangentAtSummit.length() < 1.001);
@@ -55,4 +75,4 @@ assert.strictEqual(code, 'FLC-1215-CHAM-JCK-82A');
 const codeRegex = /^FLC-\d{4}-[A-Z]{4}-[A-Z]{3}-[A-Z0-9]{3}$/;
 assert.ok(codeRegex.test(code));
 
-console.log('✅ All core ski piste mathematical formulas and deterministic generators verified successfully.');
+console.log('✅ All terrain elevation models, piste tangents, and booking generators verified successfully.');
