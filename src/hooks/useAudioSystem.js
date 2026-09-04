@@ -1,6 +1,6 @@
 /**
- * useAudioSystem: Procedural Web Audio API sound manager generating wind, snowball rumble, and UI audio.
- * Communicates with: TestScene.jsx, BookingController.jsx, and useScrollSpline.js.
+ * useAudioSystem: Procedural Web Audio API sound manager generating alpine wind, ski carving, and UI audio.
+ * Communicates with: DesktopShowcase.jsx, BookingController.jsx, and useScrollSpline.js.
  */
 
 'use client';
@@ -135,24 +135,15 @@ export function useAudioSystem() {
     const vSmooth = previousVelocityRef.current + 0.15 * (vNorm - previousVelocityRef.current);
     previousVelocityRef.current = vSmooth;
 
-    const scale = 1.0 + Math.log1p(uProgress * 1.5) * 1.15;
-
     const windFreq = WIND_MIN_FREQ * Math.pow(WIND_MAX_FREQ / WIND_MIN_FREQ, vSmooth);
-    const windGain = WIND_IDLE_GAIN + (WIND_MAX_GAIN - WIND_IDLE_GAIN) * Math.pow(vSmooth, 1.4);
+    const windGain = WIND_IDLE_GAIN + (WIND_MAX_GAIN - WIND_IDLE_GAIN) * Math.pow(vSmooth, 1.3);
     windFilterRef.current?.frequency.setTargetAtTime(windFreq, currentTime, 0.08);
     windGainRef.current?.gain.setTargetAtTime(windGain, currentTime, 0.08);
 
-    const rumbleFreq = RUMBLE_BASE_FREQ / scale;
-    const rumbleFilterFreq = 260 / scale;
-    const rumbleGain = vSmooth * (0.05 + 0.35 * uProgress);
-    rumbleOscRef.current?.frequency.setTargetAtTime(rumbleFreq, currentTime, 0.08);
-    rumbleFilterRef.current?.frequency.setTargetAtTime(rumbleFilterFreq, currentTime, 0.08);
-    rumbleGainRef.current?.gain.setTargetAtTime(rumbleGain, currentTime, 0.08);
-
-    const crunchFreq = CRUNCH_BASE_FREQ / Math.pow(scale, 0.85);
-    const crunchGain = vSmooth * Math.max(0, 0.28 - 0.10 * uProgress);
-    crunchFilterRef.current?.frequency.setTargetAtTime(crunchFreq, currentTime, 0.08);
-    crunchGainRef.current?.gain.setTargetAtTime(crunchGain, currentTime, 0.08);
+    const carvingFreq = 850 + vSmooth * 950;
+    const carvingGain = vSmooth * 0.28;
+    crunchFilterRef.current?.frequency.setTargetAtTime(carvingFreq, currentTime, 0.08);
+    crunchGainRef.current?.gain.setTargetAtTime(carvingGain, currentTime, 0.08);
   }, []);
 
   const playTelephoneRing = useCallback(() => {
