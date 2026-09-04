@@ -50,6 +50,40 @@ export function DesktopShowcase() {
     return () => cancelAnimationFrame(animationFrameId);
   }, [uRef, velocityRef, updateMotion]);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    if (showBookingDesk || activeModalCabin) {
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      const originalBodyOverflow = document.body.style.overflow;
+
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.overflow = originalBodyOverflow;
+      };
+    }
+  }, [showBookingDesk, activeModalCabin]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showBookingDesk) {
+          setShowBookingDesk(false);
+        } else if (activeModalCabin) {
+          setActiveModalCabin(null);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showBookingDesk, activeModalCabin]);
+
   const handleSelectCabin = (cabinId) => {
     playSnowSplat();
     setSplatActive(true);
@@ -160,7 +194,17 @@ export function DesktopShowcase() {
         )}
 
         {showBookingDesk && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Reservation Inquiry Desk"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowBookingDesk(false);
+              }
+            }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn"
+          >
             <BookingController
               initialCabinId={activeModalCabin || 'chalet-chamonix'}
               onClose={() => setShowBookingDesk(false)}
