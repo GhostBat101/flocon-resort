@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Syne:wght@700;800;900&display=swap');
+/**
+ * Global Styles: Tailwind directives, typography imports, design tokens, and glassmorphism utilities.
+ * Communicates with: layout.jsx, tailwind.config.js, and page.jsx.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,7 +20,7 @@
 body {
   background-color: var(--snow-base);
   color: #1A202C;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   overflow-x: hidden;
 }
 
