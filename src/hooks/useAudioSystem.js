@@ -240,6 +240,46 @@ export function useAudioSystem() {
     }
   }, [initializeAudio]);
 
+  const playSnowballLaunch = useCallback(() => {
+    initializeAudio();
+    if (!audioCtxRef.current) return;
+
+    const ctx = audioCtxRef.current;
+    const now = ctx.currentTime;
+
+    const recoilOsc = ctx.createOscillator();
+    const recoilGain = ctx.createGain();
+    recoilOsc.type = 'sine';
+    recoilOsc.frequency.setValueAtTime(240, now);
+    recoilOsc.frequency.exponentialRampToValueAtTime(50, now + 0.12);
+    recoilGain.gain.setValueAtTime(0.5, now);
+    recoilGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    recoilOsc.connect(recoilGain);
+    recoilGain.connect(masterGainRef.current);
+    recoilOsc.start(now);
+    recoilOsc.stop(now + 0.13);
+
+    if (noiseBufferRef.current) {
+      const whooshSource = ctx.createBufferSource();
+      whooshSource.buffer = noiseBufferRef.current;
+      const whooshFilter = ctx.createBiquadFilter();
+      whooshFilter.type = 'bandpass';
+      whooshFilter.Q.value = 3.0;
+      whooshFilter.frequency.setValueAtTime(350, now);
+      whooshFilter.frequency.exponentialRampToValueAtTime(2200, now + 0.25);
+      whooshFilter.frequency.exponentialRampToValueAtTime(600, now + 0.50);
+      const whooshGain = ctx.createGain();
+      whooshGain.gain.setValueAtTime(0.01, now);
+      whooshGain.gain.linearRampToValueAtTime(0.45, now + 0.20);
+      whooshGain.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
+      whooshSource.connect(whooshFilter);
+      whooshFilter.connect(whooshGain);
+      whooshGain.connect(masterGainRef.current);
+      whooshSource.start(now);
+      whooshSource.stop(now + 0.55);
+    }
+  }, [initializeAudio]);
+
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
       const nextState = !prev;
@@ -283,5 +323,6 @@ export function useAudioSystem() {
     updateMotion,
     playTelephoneRing,
     playSnowSplat,
+    playSnowballLaunch,
   };
 }
