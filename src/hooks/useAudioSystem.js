@@ -9,12 +9,11 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 
 const SAMPLE_RATE = 44100;
 const NOISE_DURATION_SEC = 2;
-const WIND_MIN_FREQ = 220;
-const WIND_MAX_FREQ = 2200;
+const WIND_MIN_FREQ = 120;
+const WIND_MAX_FREQ = 380;
 const WIND_IDLE_GAIN = 0.0;
-const WIND_MAX_GAIN = 0.35;
-const RUMBLE_BASE_FREQ = 78;
-const CRUNCH_BASE_FREQ = 1500;
+const WIND_MAX_GAIN = 0.22;
+const RUMBLE_BASE_FREQ = 64;
 const BELL_FREQ_A = 753;
 const BELL_FREQ_B = 850;
 const CLAPPER_RATE = 18;
@@ -34,10 +33,6 @@ export function useAudioSystem() {
   const rumbleOscRef = useRef(null);
   const rumbleFilterRef = useRef(null);
   const rumbleGainRef = useRef(null);
-
-  const crunchSourceRef = useRef(null);
-  const crunchFilterRef = useRef(null);
-  const crunchGainRef = useRef(null);
 
   const previousVelocityRef = useRef(0);
 
@@ -77,8 +72,8 @@ export function useAudioSystem() {
     windSource.buffer = noiseBuffer;
     windSource.loop = true;
     const windFilter = ctx.createBiquadFilter();
-    windFilter.type = 'bandpass';
-    windFilter.Q.value = 2.2;
+    windFilter.type = 'lowpass';
+    windFilter.Q.value = 0.7;
     windFilter.frequency.setValueAtTime(WIND_MIN_FREQ, ctx.currentTime);
     const windGain = ctx.createGain();
     windGain.gain.setValueAtTime(0, ctx.currentTime);
@@ -95,7 +90,7 @@ export function useAudioSystem() {
     rumbleOsc.frequency.setValueAtTime(RUMBLE_BASE_FREQ, ctx.currentTime);
     const rumbleFilter = ctx.createBiquadFilter();
     rumbleFilter.type = 'lowpass';
-    rumbleFilter.frequency.setValueAtTime(260, ctx.currentTime);
+    rumbleFilter.frequency.setValueAtTime(140, ctx.currentTime);
     const rumbleGain = ctx.createGain();
     rumbleGain.gain.setValueAtTime(0, ctx.currentTime);
     rumbleOsc.connect(rumbleFilter);
@@ -106,50 +101,40 @@ export function useAudioSystem() {
     rumbleFilterRef.current = rumbleFilter;
     rumbleGainRef.current = rumbleGain;
 
-    const crunchSource = ctx.createBufferSource();
-    crunchSource.buffer = noiseBuffer;
-    crunchSource.loop = true;
-    const crunchFilter = ctx.createBiquadFilter();
-    crunchFilter.type = 'bandpass';
-    crunchFilter.Q.value = 1.8;
-    crunchFilter.frequency.setValueAtTime(CRUNCH_BASE_FREQ, ctx.currentTime);
-    const crunchGain = ctx.createGain();
-    crunchGain.gain.setValueAtTime(0, ctx.currentTime);
-    crunchSource.connect(crunchFilter);
-    crunchFilter.connect(crunchGain);
-    crunchGain.connect(masterGain);
-    crunchSource.start(0);
-    crunchSourceRef.current = crunchSource;
-    crunchFilterRef.current = crunchFilter;
-    crunchGainRef.current = crunchGain;
-
     setIsInitialized(true);
   }, [createNoiseBuffer, isMuted]);
 
-  const updateMotion = useCallback((scrollVelocity, uProgress) => {
+  const updateMotion = useCallback((scrollVelocity) => {
     if (!audioCtxRef.current || audioCtxRef.current.state === 'suspended') return;
 
     const ctx = audioCtxRef.current;
     const currentTime = ctx.currentTime;
-    const vNorm = Math.min(1.0, Math.abs(scrollVelocity) / 2.5);
-    const vSmooth = previousVelocityRef.current + 0.15 * (vNorm - previousVelocityRef.current);
-    previousVelocityRef.current = vSmooth;
+    const absVelocity = Math.abs(scrollVelocity || 0);
 
-    if (vSmooth < 0.02) {
-      windGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.05);
-      crunchGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.05);
+    if (absVelocity < 0.005) {
+      windGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.04);
+      rumbleGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.04);
+      previousVelocityRef.current = 0;
       return;
     }
 
-    const windFreq = WIND_MIN_FREQ * Math.pow(WIND_MAX_FREQ / WIND_MIN_FREQ, vSmooth);
-    const windGain = WIND_MAX_GAIN * Math.pow(vSmooth, 1.3);
-    windFilterRef.current?.frequency.setTargetAtTime(windFreq, currentTime, 0.08);
-    windGainRef.current?.gain.setTargetAtTime(windGain, currentTime, 0.08);
+    const vNorm = Math.min(1.0, absVelocity);
+    const vSmooth = previousVelocityRef.current + 0.12 * (vNorm - previousVelocityRef.current);
+    previousVelocityRef.current = vSmooth;
 
-    const carvingFreq = 850 + vSmooth * 950;
-    const carvingGain = vSmooth * 0.22;
-    crunchFilterRef.current?.frequency.setTargetAtTime(carvingFreq, currentTime, 0.08);
-    crunchGainRef.current?.gain.setTargetAtTime(carvingGain, currentTime, 0.08);
+    if (vSmooth < 0.01) {
+      windGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.04);
+      rumbleGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.04);
+      return;
+    }
+
+    const windFreq = WIND_MIN_FREQ + (WIND_MAX_FREQ - WIND_MIN_FREQ) * vSmooth;
+    const windGain = WIND_MAX_GAIN * vSmooth;
+    windFilterRef.current?.frequency.setTargetAtTime(windFreq, currentTime, 0.06);
+    windGainRef.current?.gain.setTargetAtTime(windGain, currentTime, 0.06);
+
+    const rumbleGain = 0.12 * vSmooth;
+    rumbleGainRef.current?.gain.setTargetAtTime(rumbleGain, currentTime, 0.06);
   }, []);
 
   const playTelephoneRing = useCallback(() => {
