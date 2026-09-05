@@ -45,8 +45,12 @@ export function DesktopShowcase() {
     let animationFrameId;
 
     const syncProgress = () => {
-      if (uRef.current !== undefined) {
-        setCurrentProgress((prev) => (Math.abs(prev - uRef.current) > 0.0003 ? uRef.current : prev));
+      const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+      if (scrollY <= 2) {
+        setCurrentProgress(0.0);
+        updateMotion(0);
+      } else if (uRef.current !== undefined) {
+        setCurrentProgress((prev) => (Math.abs(prev - uRef.current) > 0.0002 ? uRef.current : prev));
         const currentVel = getVelocity ? getVelocity() : 0;
         updateMotion(currentVel);
       }
