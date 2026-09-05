@@ -24,7 +24,7 @@ export function DesktopShowcase() {
   const [showBookingDesk, setShowBookingDesk] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(0);
 
-  const { curve, uRef, velocityRef } = useScrollSpline(containerRef);
+  const { curve, uRef, getVelocity } = useScrollSpline(containerRef);
   const {
     isMuted,
     toggleMute,
@@ -40,14 +40,15 @@ export function DesktopShowcase() {
     const syncProgress = () => {
       if (uRef.current !== undefined) {
         setCurrentProgress(uRef.current);
-        updateMotion(velocityRef.current || 0, uRef.current);
+        const currentVel = getVelocity ? getVelocity() : 0;
+        updateMotion(currentVel);
       }
       animationFrameId = requestAnimationFrame(syncProgress);
     };
 
     animationFrameId = requestAnimationFrame(syncProgress);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [uRef, velocityRef, updateMotion]);
+  }, [uRef, getVelocity, updateMotion]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -161,6 +162,7 @@ export function DesktopShowcase() {
 
         <IceShardOverlay
           progress={currentProgress}
+          isModalOpen={Boolean(activeModalCabin || showBookingDesk)}
           onSelectCabin={handleSelectCabin}
           onNavigateNext={handleNavigateSpline}
         />
@@ -199,7 +201,7 @@ export function DesktopShowcase() {
                 setShowBookingDesk(false);
               }
             }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fadeIn"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B1519]/55 backdrop-blur-sm animate-fadeIn"
           >
             <BookingController
               initialCabinId={activeModalCabin || 'chalet-chamonix'}
