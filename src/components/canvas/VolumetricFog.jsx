@@ -53,7 +53,7 @@ export default function VolumetricFog() {
           ? FOG_COLOR_MID
           : FOG_COLOR_SUMMIT;
 
-      const material = new THREE.MeshBasicMaterial({
+      const material = new THREE.MeshLambertMaterial({
         color,
         transparent: true,
         opacity: cfg.opacity,
@@ -137,7 +137,7 @@ export default function VolumetricFog() {
             rotation={[-Math.PI / 2, 0, 0]}
           >
             <circleGeometry args={[sheet.radius, 32]} />
-            <meshBasicMaterial
+            <meshLambertMaterial
               color={FOG_COLOR_VALLEY}
               transparent
               opacity={sheet.opacity}
