@@ -82,7 +82,7 @@ export default function AccessibilityOverlay({ onSelectLandmark, activeLandmarkI
         {announcement}
       </div>
 
-      <ul className="flex flex-col gap-1.5 list-none p-0 m-0 pointer-events-auto">
+      <ul className="flex flex-col gap-1.5 list-none p-0 m-0">
         {LANDMARKS.map((landmark) => {
           const isSelected = activeLandmarkId === landmark.id || activeFocus === landmark.id;
           return (
@@ -93,11 +93,11 @@ export default function AccessibilityOverlay({ onSelectLandmark, activeLandmarkI
                 onClick={() => handleActivate(landmark)}
                 onFocus={() => handleFocus(landmark)}
                 aria-label={`${landmark.name}, Elevation ${landmark.elevation}. ${landmark.description}`}
-                className={`group flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-label font-bold transition-all ${
+                className={`sr-only focus:not-sr-only focus:fixed focus:top-16 focus:left-6 focus:z-50 focus:flex focus:items-center focus:gap-3 focus:px-5 focus:py-3 focus:rounded-xl focus:text-xs focus:font-label focus:font-bold focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#FFB040] pointer-events-auto ${
                   isSelected
-                    ? 'bg-[#2D4A43] text-[#F3F7F9] shadow-md ring-2 ring-[#2D4A43] ring-offset-2 ring-offset-[#F3F7F9]'
-                    : 'bg-[#F3F7F9]/85 text-[#2D4A43] hover:bg-[#F3F7F9] border border-[#9EBBC9]/40 backdrop-blur-md opacity-85 hover:opacity-100'
-                } focus:outline-none focus:ring-2 focus:ring-[#2D4A43] focus:ring-offset-2 focus:ring-offset-[#FFB040]`}
+                    ? 'focus:bg-[#2D4A43] focus:text-[#F3F7F9]'
+                    : 'focus:bg-[#F3F7F9] focus:text-[#2D4A43] focus:border focus:border-[#9EBBC9]'
+                }`}
               >
                 <span
                   className={`w-2 h-2 rounded-full ${
