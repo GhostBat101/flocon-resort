@@ -20,7 +20,7 @@ export function IceShardOverlay({
     (s) => progress >= s.uStart && progress <= s.uEnd
   );
 
-  if (!activeStation || isModalOpen) return null;
+  if (!activeStation || isModalOpen || activeStation.isHero) return null;
 
   const { id, uStart, uPeak, uCrack, uEnd, side, isHero } = activeStation;
 
