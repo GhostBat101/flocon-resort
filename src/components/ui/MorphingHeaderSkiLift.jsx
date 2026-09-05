@@ -31,8 +31,8 @@ export default function MorphingHeaderSkiLift({
   const easeMorph = morphT * morphT * (3 - 2 * morphT);
 
   const containerTop = `calc(${16 * (1 - easeMorph)}px + ${easeMorph * 50}% - ${easeMorph * 130}px)`;
-  const containerRight = `${180 * (1 - easeMorph) + 24 * easeMorph}px`;
-  const containerWidth = `${520 * (1 - easeMorph) + 154 * easeMorph}px`;
+  const containerRight = `calc(50% * (1 - ${easeMorph}) - ${240 * (1 - easeMorph)}px + ${24 * easeMorph}px)`;
+  const containerWidth = `${480 * (1 - easeMorph) + 154 * easeMorph}px`;
   const containerHeight = `${44 * (1 - easeMorph) + 256 * easeMorph}px`;
   const containerRadius = `${22 * (1 - easeMorph) + 20 * easeMorph}px`;
 
@@ -58,7 +58,7 @@ export default function MorphingHeaderSkiLift({
             <span className="font-headline font-black text-lg tracking-wider text-[#F3F7F9] uppercase block leading-none drop-shadow-sm">
               Flocon
             </span>
-            <span className="font-label text-[9px] uppercase tracking-[0.22em] text-[#9EBBC9] font-bold block mt-0.5">
+            <span className="font-body text-[9px] uppercase tracking-[0.22em] text-[#9EBBC9] font-bold block mt-0.5">
               Altitude 2,800m
             </span>
           </div>
@@ -78,7 +78,7 @@ export default function MorphingHeaderSkiLift({
         <a
           href={`tel:${RESORT_FACTS.dummyPhone}`}
           aria-label="Call Chalet Concierge"
-          className="px-4 py-2.5 rounded-xl bg-[#2D4A43] text-[#F3F7F9] font-label font-bold text-xs uppercase tracking-wider hover:bg-[#2D4A43]/90 shadow-md transition border border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+          className="px-4 py-2.5 rounded-xl bg-[#2D4A43] text-[#F3F7F9] font-body font-bold text-xs uppercase tracking-wider hover:bg-[#2D4A43]/90 shadow-md transition border border-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
         >
           Chalet Concierge
         </a>
@@ -98,7 +98,7 @@ export default function MorphingHeaderSkiLift({
         {showHeaderContent && (
           <nav
             aria-label="Traditional Resort Navigation"
-            className="w-full h-full px-2.5 flex items-center justify-between gap-1 text-[#2D4A43] font-label text-xs font-bold"
+            className="w-full h-full px-2.5 flex items-center justify-between gap-1 text-[#2D4A43] font-body text-xs font-semibold"
             style={{
               opacity: headerContentOpacity,
             }}
@@ -108,7 +108,7 @@ export default function MorphingHeaderSkiLift({
               onClick={() => onNavigate && onNavigate(0.0)}
               className={`px-3 py-1.5 rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040] ${
                 isSanctuaryActive
-                  ? 'bg-[#2D4A43] text-[#F3F7F9] shadow-sm'
+                  ? 'bg-[#2D4A43] text-[#F3F7F9] shadow-sm font-bold'
                   : 'hover:bg-white/80 text-[#2D4A43]'
               }`}
             >
@@ -142,7 +142,7 @@ export default function MorphingHeaderSkiLift({
             <button
               type="button"
               onClick={() => onActivateBookingDesk && onActivateBookingDesk()}
-              className="px-3.5 py-1.5 rounded-xl bg-[#2D4A43] text-[#F3F7F9] hover:bg-[#2D4A43]/90 shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+              className="px-3.5 py-1.5 rounded-xl bg-[#2D4A43] text-[#F3F7F9] hover:bg-[#2D4A43]/90 shadow-sm transition font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
             >
               Reservations
             </button>
@@ -152,7 +152,7 @@ export default function MorphingHeaderSkiLift({
         {showLiftContent && (
           <nav
             aria-label="Ski-Lift Waypoint Navigation"
-            className="w-full h-full p-2 flex flex-col justify-between text-[#2D4A43] font-label"
+            className="w-full h-full p-2 flex flex-col justify-between text-[#2D4A43] font-body"
             style={{
               opacity: liftContentOpacity,
             }}
@@ -173,9 +173,9 @@ export default function MorphingHeaderSkiLift({
                       type="button"
                       onClick={() => onNavigate && onNavigate(sec.u)}
                       aria-label={`Jump to ${sec.label}`}
-                      className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040] ${
+                      className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040] ${
                         isActive
-                          ? 'bg-[#2D4A43] text-[#F3F7F9] shadow-sm'
+                          ? 'bg-[#2D4A43] text-[#F3F7F9] shadow-sm font-bold'
                           : 'text-[#2D4A43] hover:bg-white/80 hover:text-[#2D4A43]'
                       }`}
                     >
