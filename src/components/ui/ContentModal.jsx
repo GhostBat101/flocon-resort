@@ -5,11 +5,12 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, Check, Mountain, Calendar, Sparkles } from 'lucide-react';
 import { CABINS } from '@/data/cabins';
 
 export function ContentModal({ cabinId, onClose, onBook }) {
+  const dialogRef = useRef(null);
   const cabin = CABINS.find((c) => c.id === cabinId) || CABINS[0];
 
   useEffect(() => {
@@ -22,10 +23,20 @@ export function ContentModal({ cabinId, onClose, onBook }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
+  useEffect(() => {
+    if (dialogRef.current) {
+      const focusable = dialogRef.current.querySelectorAll('button');
+      if (focusable.length > 0) {
+        focusable[0].focus();
+      }
+    }
+  }, []);
+
   if (!cabin) return null;
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-cabin-title"
@@ -34,14 +45,14 @@ export function ContentModal({ cabinId, onClose, onBook }) {
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0B1519]/55 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0B1519]/60 backdrop-blur-sm animate-fadeIn"
     >
-      <div className="w-full max-w-xl p-6 sm:p-8 rounded-3xl bg-[#F3F7F9]/90 backdrop-blur-2xl border border-white/80 shadow-2xl text-[#2D4A43] font-body relative space-y-6">
+      <div className="w-full max-w-xl p-6 sm:p-8 rounded-3xl bg-[#F3F7F9]/95 backdrop-blur-2xl border border-white/80 shadow-2xl text-[#2D4A43] font-body relative space-y-6">
         <button
           type="button"
           onClick={onClose}
           aria-label="Close modal"
-          className="absolute top-5 right-5 p-2 rounded-full hover:bg-[#2D4A43]/10 text-[#2D4A43] transition"
+          className="absolute top-5 right-5 p-2 rounded-full hover:bg-[#2D4A43]/10 text-[#2D4A43] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
         >
           <X className="w-5 h-5" />
         </button>
@@ -83,7 +94,7 @@ export function ContentModal({ cabinId, onClose, onBook }) {
           <button
             type="button"
             onClick={() => onBook && onBook(cabin.id)}
-            className="w-full sm:flex-1 min-h-[48px] py-3.5 px-6 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-white font-label font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition"
+            className="w-full sm:flex-1 min-h-[48px] py-3.5 px-6 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-white font-label font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
           >
             <Calendar className="w-4 h-4 text-[#FFB040]" />
             <span>Reserve {cabin.name}</span>
@@ -91,9 +102,9 @@ export function ContentModal({ cabinId, onClose, onBook }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto min-h-[48px] py-3.5 px-5 rounded-xl bg-white hover:bg-[#F3F7F9] border border-[#9EBBC9]/50 text-[#2D4A43] font-label font-bold text-xs uppercase tracking-wider transition"
+            className="w-full sm:w-auto min-h-[48px] py-3.5 px-5 rounded-xl bg-white hover:bg-[#F3F7F9] border border-[#9EBBC9]/50 text-[#2D4A43] font-label font-bold text-xs uppercase tracking-wider transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
           >
-            Shake Off Snow
+            Return to Ridge
           </button>
         </div>
       </div>
