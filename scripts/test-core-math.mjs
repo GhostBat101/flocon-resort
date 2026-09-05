@@ -1,11 +1,14 @@
 /**
- * test-core-math: Node.js assert-based unit tests for terrain heightfield, piste tangents, and booking code generator.
- * Communicates with: terrain.js, useScrollSpline.js, MountainSlope.jsx, and BookingController.jsx.
+ * test-core-math: Node.js assert-based unit tests for terrain heightfield, piste tangents, stations, and booking code generator.
+ * Communicates with: terrain.js, useScrollSpline.js, stations.js, and BookingController.jsx.
  */
 
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import * as THREE from 'three';
 import { getAlpineElevation } from '../src/utils/terrain.js';
+import { STATIONS } from '../src/data/stations.js';
 
 const PISTE_WAYPOINTS = [
   [0, -160],
@@ -88,4 +91,22 @@ assert.strictEqual(code, 'FLC-1215-CHAM-JCK-82A');
 const codeRegex = /^FLC-\d{4}-[A-Z]{4}-[A-Z]{3}-[A-Z0-9]{3}$/;
 assert.ok(codeRegex.test(code));
 
-console.log('✅ All terrain elevation models, camera stability matrices, and booking generators verified successfully.');
+assert.strictEqual(STATIONS.length, 4);
+
+STATIONS.forEach((station, index) => {
+  assert.ok(station.uStart < station.uPeak);
+  assert.ok(station.uPeak < station.uCrack);
+  assert.ok(station.uCrack < station.uEnd);
+  assert.ok(station.whyBook.length >= 3);
+  assert.ok(station.title.length > 0);
+
+  if (index > 0) {
+    const prev = STATIONS[index - 1];
+    assert.ok(station.uStart >= prev.uPeak);
+  }
+
+  const publicImagePath = path.join(process.cwd(), 'public', station.image.replace(/^\//, ''));
+  assert.ok(fs.existsSync(publicImagePath), `Image file missing: ${publicImagePath}`);
+});
+
+console.log('✅ All terrain elevation models, camera stability matrices, station thresholds, and booking generators verified successfully.');
