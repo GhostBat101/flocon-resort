@@ -73,7 +73,7 @@ export const STATIONS = [
     uEnd: 0.88,
     title: 'ZERMATT',
     tag: 'ELEVATION 1,950M',
-    subtitle: 'The Couplers Peak',
+    subtitle: 'The Couloirs Peak',
     image: '/images/zermatt_station.jpg',
     whyBook: [
       'Unobstructed Matterhorn balcony panorama',
