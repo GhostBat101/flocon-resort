@@ -11,8 +11,8 @@ const SAMPLE_RATE = 44100;
 const NOISE_DURATION_SEC = 2;
 const WIND_MIN_FREQ = 220;
 const WIND_MAX_FREQ = 2200;
-const WIND_IDLE_GAIN = 0.03;
-const WIND_MAX_GAIN = 0.40;
+const WIND_IDLE_GAIN = 0.0;
+const WIND_MAX_GAIN = 0.35;
 const RUMBLE_BASE_FREQ = 78;
 const CRUNCH_BASE_FREQ = 1500;
 const BELL_FREQ_A = 753;
@@ -135,13 +135,19 @@ export function useAudioSystem() {
     const vSmooth = previousVelocityRef.current + 0.15 * (vNorm - previousVelocityRef.current);
     previousVelocityRef.current = vSmooth;
 
+    if (vSmooth < 0.02) {
+      windGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.05);
+      crunchGainRef.current?.gain.setTargetAtTime(0, currentTime, 0.05);
+      return;
+    }
+
     const windFreq = WIND_MIN_FREQ * Math.pow(WIND_MAX_FREQ / WIND_MIN_FREQ, vSmooth);
-    const windGain = WIND_IDLE_GAIN + (WIND_MAX_GAIN - WIND_IDLE_GAIN) * Math.pow(vSmooth, 1.3);
+    const windGain = WIND_MAX_GAIN * Math.pow(vSmooth, 1.3);
     windFilterRef.current?.frequency.setTargetAtTime(windFreq, currentTime, 0.08);
     windGainRef.current?.gain.setTargetAtTime(windGain, currentTime, 0.08);
 
     const carvingFreq = 850 + vSmooth * 950;
-    const carvingGain = vSmooth * 0.28;
+    const carvingGain = vSmooth * 0.22;
     crunchFilterRef.current?.frequency.setTargetAtTime(carvingFreq, currentTime, 0.08);
     crunchGainRef.current?.gain.setTargetAtTime(carvingGain, currentTime, 0.08);
   }, []);
@@ -193,42 +199,38 @@ export function useAudioSystem() {
     clapperOsc.stop(now + 1.7);
   }, [initializeAudio]);
 
-  const playSnowSplat = useCallback(() => {
+  const playCrystalChime = useCallback(() => {
     initializeAudio();
     if (!audioCtxRef.current) return;
 
     const ctx = audioCtxRef.current;
     const now = ctx.currentTime;
 
-    const thudOsc = ctx.createOscillator();
-    const thudGain = ctx.createGain();
-    thudOsc.type = 'sine';
-    thudOsc.frequency.setValueAtTime(160, now);
-    thudOsc.frequency.exponentialRampToValueAtTime(30, now + 0.07);
-    thudGain.gain.setValueAtTime(0.6, now);
-    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
-    thudOsc.connect(thudGain);
-    thudGain.connect(masterGainRef.current);
-    thudOsc.start(now);
-    thudOsc.stop(now + 0.08);
+    const oscA = ctx.createOscillator();
+    const oscB = ctx.createOscillator();
+    const gainA = ctx.createGain();
+    const gainB = ctx.createGain();
 
-    if (noiseBufferRef.current) {
-      const slushSource = ctx.createBufferSource();
-      slushSource.buffer = noiseBufferRef.current;
-      const slushFilter = ctx.createBiquadFilter();
-      slushFilter.type = 'lowpass';
-      slushFilter.Q.value = 2.5;
-      slushFilter.frequency.setValueAtTime(3000, now);
-      slushFilter.frequency.exponentialRampToValueAtTime(350, now + 0.20);
-      const slushGain = ctx.createGain();
-      slushGain.gain.setValueAtTime(0.7, now);
-      slushGain.gain.exponentialRampToValueAtTime(0.001, now + 0.20);
-      slushSource.connect(slushFilter);
-      slushFilter.connect(slushGain);
-      slushGain.connect(masterGainRef.current);
-      slushSource.start(now);
-      slushSource.stop(now + 0.22);
-    }
+    oscA.type = 'sine';
+    oscA.frequency.setValueAtTime(587.33, now);
+    oscB.type = 'sine';
+    oscB.frequency.setValueAtTime(880.0, now);
+
+    gainA.gain.setValueAtTime(0.14, now);
+    gainA.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+
+    gainB.gain.setValueAtTime(0.09, now);
+    gainB.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+
+    oscA.connect(gainA);
+    oscB.connect(gainB);
+    gainA.connect(masterGainRef.current);
+    gainB.connect(masterGainRef.current);
+
+    oscA.start(now);
+    oscB.start(now);
+    oscA.stop(now + 0.6);
+    oscB.stop(now + 0.6);
   }, [initializeAudio]);
 
   const playSnowballLaunch = useCallback(() => {
@@ -313,7 +315,8 @@ export function useAudioSystem() {
     toggleMute,
     updateMotion,
     playTelephoneRing,
-    playSnowSplat,
+    playCrystalChime,
+    playSnowSplat: playCrystalChime,
     playSnowballLaunch,
   };
 }
