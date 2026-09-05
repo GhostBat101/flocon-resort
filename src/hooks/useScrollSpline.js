@@ -53,7 +53,7 @@ export function useScrollSpline(triggerRef) {
           trigger: triggerRef.current,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 1.5,
+          scrub: 0.8,
         },
         onUpdate: () => {
           const now = Date.now();
