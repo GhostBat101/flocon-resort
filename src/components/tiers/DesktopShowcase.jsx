@@ -1,6 +1,6 @@
 /**
  * DesktopShowcase: Tier 1 flagship 3D experience with scroll-driven timeline, HUD, and audio.
- * Communicates with: SceneContainer.jsx, IceShardOverlay.jsx, useScrollSpline.js, and useAudioSystem.js.
+ * Communicates with: SceneContainer.jsx, HotlineModal.jsx, IceShardOverlay.jsx, and useScrollSpline.js.
  */
 
 'use client';
@@ -14,6 +14,7 @@ import AccessibilityOverlay from '@/components/canvas/AccessibilityOverlay';
 import ContentModal from '@/components/ui/ContentModal';
 import BookingController from '@/components/ui/BookingController';
 import IceShardOverlay from '@/components/ui/IceShardOverlay';
+import HotlineModal from '@/components/ui/HotlineModal';
 import { useScrollSpline } from '@/hooks/useScrollSpline';
 import { useAudioSystem } from '@/hooks/useAudioSystem';
 import { Sparkles } from 'lucide-react';
@@ -23,6 +24,7 @@ export function DesktopShowcase() {
   const containerRef = useRef(null);
   const [activeModalCabin, setActiveModalCabin] = useState(null);
   const [showBookingDesk, setShowBookingDesk] = useState(false);
+  const [isHotlineOpen, setIsHotlineOpen] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(0);
 
   const { curve, uRef, getVelocity } = useScrollSpline(containerRef);
@@ -64,7 +66,7 @@ export function DesktopShowcase() {
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
-    if (showBookingDesk || activeModalCabin) {
+    if (showBookingDesk || activeModalCabin || isHotlineOpen) {
       const originalHtmlOverflow = document.documentElement.style.overflow;
       const originalBodyOverflow = document.body.style.overflow;
 
@@ -76,14 +78,16 @@ export function DesktopShowcase() {
         document.body.style.overflow = originalBodyOverflow;
       };
     }
-  }, [showBookingDesk, activeModalCabin]);
+  }, [showBookingDesk, activeModalCabin, isHotlineOpen]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        if (showBookingDesk) {
+        if (isHotlineOpen) {
+          setIsHotlineOpen(false);
+        } else if (showBookingDesk) {
           setShowBookingDesk(false);
         } else if (activeModalCabin) {
           setActiveModalCabin(null);
@@ -93,7 +97,7 @@ export function DesktopShowcase() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showBookingDesk, activeModalCabin]);
+  }, [showBookingDesk, activeModalCabin, isHotlineOpen]);
 
   const handleSelectCabin = (cabinId) => {
     playCrystalChime();
@@ -102,7 +106,7 @@ export function DesktopShowcase() {
 
   const handleActivatePhone = () => {
     playTelephoneRing();
-    setShowBookingDesk(true);
+    setIsHotlineOpen(true);
   };
 
   const handleActivateLedger = () => {
@@ -122,7 +126,9 @@ export function DesktopShowcase() {
   const handleLandmarkSelect = (landmark, isActivation) => {
     handleNavigateSpline(landmark.progress);
     if (isActivation) {
-      if (landmark.id === 'hotline' || landmark.id === 'booking') {
+      if (landmark.id === 'hotline') {
+        setIsHotlineOpen(true);
+      } else if (landmark.id === 'booking') {
         setShowBookingDesk(true);
       } else if (landmark.id === 'cabins' || landmark.id === 'chamonix' || landmark.id === 'valais' || landmark.id === 'zermatt') {
         handleSelectCabin(landmark.id === 'cabins' ? 'chalet-chamonix' : `chalet-${landmark.id}`);
@@ -159,13 +165,14 @@ export function DesktopShowcase() {
           onNavigate={handleNavigateSpline}
           onSelectStationPreview={handleSelectCabin}
           onActivateBookingDesk={() => setShowBookingDesk(true)}
+          onOpenHotline={() => setIsHotlineOpen(true)}
           isMuted={isMuted}
           onToggleMute={toggleMute}
         />
 
         <IceShardOverlay
           progress={currentProgress}
-          isModalOpen={Boolean(activeModalCabin || showBookingDesk)}
+          isModalOpen={Boolean(activeModalCabin || showBookingDesk || isHotlineOpen)}
           onSelectCabin={handleSelectCabin}
           onNavigateNext={handleNavigateSpline}
         />
@@ -182,6 +189,11 @@ export function DesktopShowcase() {
             Haute Route alpine descent • Explore sanctuary chalets and concierge desk
           </p>
         </div>
+
+        <HotlineModal
+          isOpen={isHotlineOpen}
+          onClose={() => setIsHotlineOpen(false)}
+        />
 
         {activeModalCabin && (
           <ContentModal
