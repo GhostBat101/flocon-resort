@@ -46,7 +46,7 @@ export function DesktopShowcase() {
 
     const syncProgress = () => {
       const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-      if (scrollY <= 2) {
+      if (scrollY <= 6) {
         setCurrentProgress(0.0);
         updateMotion(0);
       } else if (uRef.current !== undefined) {
@@ -171,7 +171,7 @@ export function DesktopShowcase() {
         />
 
         <div className={`absolute bottom-6 left-6 z-30 pointer-events-none max-w-sm p-4 rounded-2xl bg-[#F3F7F9]/85 backdrop-blur-md border border-white/60 shadow-lg text-[#2D4A43] transition-opacity duration-300 ${currentProgress < 0.18 ? 'opacity-0' : 'opacity-100'}`}>
-          <div className="flex items-center gap-2 text-xs font-label font-bold text-[#FFB040] uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-xs font-body font-semibold text-[#FFB040] uppercase tracking-wider mb-1">
             <Sparkles className="w-3.5 h-3.5 fill-current" />
             <span>Descent Altitude</span>
           </div>
