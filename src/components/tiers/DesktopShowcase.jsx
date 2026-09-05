@@ -46,7 +46,7 @@ export function DesktopShowcase() {
 
     const syncProgress = () => {
       if (uRef.current !== undefined) {
-        setCurrentProgress(uRef.current);
+        setCurrentProgress((prev) => (Math.abs(prev - uRef.current) > 0.0003 ? uRef.current : prev));
         const currentVel = getVelocity ? getVelocity() : 0;
         updateMotion(currentVel);
       }
@@ -153,6 +153,7 @@ export function DesktopShowcase() {
         <MorphingHeaderSkiLift
           currentProgress={currentProgress}
           onNavigate={handleNavigateSpline}
+          onSelectStationPreview={handleSelectCabin}
           onActivateBookingDesk={() => setShowBookingDesk(true)}
           isMuted={isMuted}
           onToggleMute={toggleMute}
@@ -174,7 +175,7 @@ export function DesktopShowcase() {
             {currentProgress < 0.35 ? 'Summit Crags • 2,800m' : currentProgress < 0.75 ? 'Mid-Slope Forest • 2,100m' : 'Valley Village • 1,200m'}
           </p>
           <p className="font-body text-xs text-[#2D4A43]/80 mt-1">
-            Scroll to carve down the mountain • Click chalets or phone to interact
+            Haute Route alpine descent • Explore sanctuary chalets and concierge desk
           </p>
         </div>
 
