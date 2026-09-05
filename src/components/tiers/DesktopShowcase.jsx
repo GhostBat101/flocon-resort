@@ -8,14 +8,15 @@
 import React, { useRef, useState, useEffect } from 'react';
 import SceneContainer from '@/components/canvas/SceneContainer';
 import WebGLErrorBoundary from '@/components/canvas/WebGLErrorBoundary';
-import SkiLiftNav from '@/components/ui/SkiLiftNav';
+import MorphingHeaderSkiLift from '@/components/ui/MorphingHeaderSkiLift';
+import LuxuryResortHero from '@/components/ui/LuxuryResortHero';
 import AccessibilityOverlay from '@/components/canvas/AccessibilityOverlay';
 import ContentModal from '@/components/ui/ContentModal';
 import BookingController from '@/components/ui/BookingController';
 import IceShardOverlay from '@/components/ui/IceShardOverlay';
 import { useScrollSpline } from '@/hooks/useScrollSpline';
 import { useAudioSystem } from '@/hooks/useAudioSystem';
-import { Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { RESORT_FACTS } from '@/data/cabins';
 
 export function DesktopShowcase() {
@@ -137,28 +138,18 @@ export function DesktopShowcase() {
           activeLandmarkId={activeModalCabin}
         />
 
-        <SkiLiftNav
-          currentProgress={currentProgress}
-          onNavigate={handleNavigateSpline}
+        <LuxuryResortHero
+          progress={currentProgress}
+          onBook={() => setShowBookingDesk(true)}
+          onScrollPrompt={() => handleNavigateSpline(0.14)}
         />
 
-        <header className="absolute top-4 right-6 z-30 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={toggleMute}
-            aria-label={isMuted ? 'Unmute alpine audio' : 'Mute alpine audio'}
-            className="p-2.5 rounded-xl bg-[#F3F7F9]/85 backdrop-blur-md border border-[#9EBBC9]/40 text-[#2D4A43] hover:bg-[#F3F7F9] shadow-sm transition"
-          >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
-
-          <a
-            href={`tel:${RESORT_FACTS.dummyPhone}`}
-            className="px-4 py-2.5 rounded-xl bg-[#2D4A43] text-white font-label font-bold text-xs uppercase tracking-wider hover:bg-[#2D4A43]/90 shadow-md transition"
-          >
-            Hotline
-          </a>
-        </header>
+        <MorphingHeaderSkiLift
+          currentProgress={currentProgress}
+          onNavigate={handleNavigateSpline}
+          isMuted={isMuted}
+          onToggleMute={toggleMute}
+        />
 
         <IceShardOverlay
           progress={currentProgress}
