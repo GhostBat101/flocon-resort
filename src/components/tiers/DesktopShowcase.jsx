@@ -36,6 +36,12 @@ export function DesktopShowcase() {
   } = useAudioSystem();
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  useEffect(() => {
     let animationFrameId;
 
     const syncProgress = () => {
@@ -147,6 +153,7 @@ export function DesktopShowcase() {
         <MorphingHeaderSkiLift
           currentProgress={currentProgress}
           onNavigate={handleNavigateSpline}
+          onActivateBookingDesk={() => setShowBookingDesk(true)}
           isMuted={isMuted}
           onToggleMute={toggleMute}
         />
