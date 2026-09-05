@@ -11,7 +11,7 @@ import { getAssetUrl } from '@/utils/assets';
 
 const MELT_CUTOFF_U = 0.085;
 const HERO_PHOTO_PATH = getAssetUrl('/images/summit_hero.webp');
-const SHARD_COUNT = 160;
+const SHARD_COUNT = 320;
 
 function createIceShards(count) {
   const shards = [];
@@ -26,21 +26,21 @@ function createIceShards(count) {
     const rand4 = seed4 - Math.floor(seed4);
 
     const isLineOne = i % 2 === 0;
-    const x0 = isLineOne ? (rand1 - 0.5) * 560 : (rand1 - 0.5) * 380;
-    const y0 = isLineOne ? -32 + (rand2 - 0.5) * 32 : 36 + (rand2 - 0.5) * 32;
+    const x0 = isLineOne ? (rand1 - 0.5) * 580 : (rand1 - 0.5) * 380;
+    const y0 = isLineOne ? -32 + (rand2 - 0.5) * 28 : 32 + (rand2 - 0.5) * 28;
 
-    const angle = Math.atan2(y0, x0) + (rand3 - 0.5) * 0.9;
-    const speed = 280 + rand4 * 560;
+    const angle = Math.atan2(y0, x0) + (rand3 - 0.5) * 1.1;
+    const speed = 360 + rand4 * 720;
     const vx = Math.cos(angle) * speed;
-    const vy = Math.sin(angle) * speed - 60 * rand2;
-    const rotSpeed = (rand1 - 0.5) * 16;
-    const size = 3.5 + rand2 * 4.5;
-    const alphaBase = 0.8 + rand3 * 0.2;
+    const vy = Math.sin(angle) * speed - 80 * rand2;
+    const rotSpeed = (rand1 - 0.5) * 22;
+    const size = 1.8 + rand2 * 2.8;
+    const alphaBase = 0.85 + rand3 * 0.15;
 
     const vertices = [
-      [-size * 0.5, -size * (0.6 + rand1 * 0.5)],
-      [size * (0.6 + rand2 * 0.5), size * 0.2],
-      [-size * (0.2 + rand3 * 0.4), size * (0.7 + rand4 * 0.5)],
+      [-size * 0.5, -size * (0.8 + rand1 * 0.5)],
+      [size * (0.7 + rand2 * 0.5), size * 0.15],
+      [-size * (0.2 + rand3 * 0.4), size * (0.8 + rand4 * 0.4)],
     ];
 
     shards.push({
@@ -52,7 +52,7 @@ function createIceShards(count) {
       size,
       alphaBase,
       vertices,
-      gravity: 320 + rand2 * 260,
+      gravity: 340 + rand2 * 320,
     });
   }
   return shards;
@@ -101,10 +101,11 @@ export default function LuxuryResortHero({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
     const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1, 2);
-    const targetW = Math.round(rect.width * dpr);
-    const targetH = Math.round(rect.height * dpr);
+    const winW = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const winH = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const targetW = Math.round(winW * dpr);
+    const targetH = Math.round(winH * dpr);
 
     if (targetW > 0 && targetH > 0 && (canvas.width !== targetW || canvas.height !== targetH)) {
       canvas.width = targetW;
@@ -119,11 +120,11 @@ export default function LuxuryResortHero({
 
     if (meltT <= 0.005 || meltT >= 0.35) return;
 
-    const t = easeMelt * 2.4;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    const t = easeMelt * 2.5;
+    const centerX = winW / 2;
+    const centerY = winH * 0.38;
     const shards = shardsRef.current;
-    const alphaEnvelope = Math.max(0, 1 - (meltT / 0.35)) * Math.min(1, meltT * 12);
+    const alphaEnvelope = Math.max(0, 1 - (meltT / 0.35)) * Math.min(1, meltT * 15);
 
     ctx.save();
     ctx.scale(dpr, dpr);
@@ -133,8 +134,8 @@ export default function LuxuryResortHero({
       const curX = centerX + s.x0 + s.vx * t;
       const curY = centerY + s.y0 + s.vy * t + 0.5 * s.gravity * t * t;
       const curRot = s.rotSpeed * t;
-      const curScale = Math.max(0, 1 - t * 0.9);
-      const curAlpha = Math.max(0, s.alphaBase * alphaEnvelope * (1 - t * 1.1));
+      const curScale = Math.max(0, 1 - t * 0.95);
+      const curAlpha = Math.max(0, s.alphaBase * alphaEnvelope * (1 - t * 1.15));
 
       if (curAlpha <= 0 || curScale <= 0) continue;
 
@@ -143,9 +144,9 @@ export default function LuxuryResortHero({
       ctx.rotate(curRot);
       ctx.scale(curScale, curScale);
 
-      ctx.fillStyle = `rgba(235, 245, 255, ${curAlpha * 0.75})`;
-      ctx.strokeStyle = `rgba(185, 225, 255, ${curAlpha * 0.9})`;
-      ctx.lineWidth = 0.8;
+      ctx.fillStyle = `rgba(245, 250, 255, ${curAlpha * 0.85})`;
+      ctx.strokeStyle = `rgba(195, 235, 255, ${curAlpha * 0.95})`;
+      ctx.lineWidth = 0.6;
 
       ctx.beginPath();
       ctx.moveTo(s.vertices[0][0], s.vertices[0][1]);
@@ -179,6 +180,11 @@ export default function LuxuryResortHero({
         pointerEvents: meltT > 0.4 ? 'none' : 'auto',
       }}
     >
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 w-screen h-screen pointer-events-none z-30"
+      />
+
       <div className="absolute inset-0 pointer-events-none">
         <img
           src={HERO_PHOTO_PATH}
@@ -203,11 +209,6 @@ export default function LuxuryResortHero({
         </div>
 
         <div className="relative max-w-4xl w-full min-h-[170px] sm:min-h-[220px] flex flex-col items-center justify-center">
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 w-full h-full pointer-events-none z-20"
-          />
-
           <div
             className="flex flex-col items-center will-change-transform"
             style={{
@@ -227,7 +228,7 @@ export default function LuxuryResortHero({
         </div>
 
         <div
-          className="mt-8 sm:mt-10 p-2 sm:p-2.5 rounded-3xl bg-[#0B1519]/50 backdrop-blur-xl border border-white/20 shadow-2xl flex flex-col sm:flex-row items-center gap-2 sm:gap-3 max-w-3xl w-full will-change-transform"
+          className="mt-8 sm:mt-10 p-2 sm:p-2.5 rounded-3xl bg-[#0B1519]/65 backdrop-blur-xl border border-white/20 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 max-w-3xl w-full will-change-transform overflow-hidden"
           style={{
             transform: bottomPillTransform,
             opacity: bottomPillOpacity,
@@ -237,7 +238,7 @@ export default function LuxuryResortHero({
           <button
             type="button"
             onClick={onBook}
-            className="flex-1 w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+            className="flex-1 min-w-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
           >
             <Calendar className="w-4 h-4 text-[#FFB040] shrink-0" />
             <div className="min-w-0">
@@ -249,7 +250,7 @@ export default function LuxuryResortHero({
           <button
             type="button"
             onClick={onBook}
-            className="flex-1 w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+            className="flex-1 min-w-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
           >
             <Home className="w-4 h-4 text-[#FFB040] shrink-0" />
             <div className="min-w-0">
@@ -261,7 +262,7 @@ export default function LuxuryResortHero({
           <button
             type="button"
             onClick={onBook}
-            className="flex-1 w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+            className="flex-1 min-w-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
           >
             <Users className="w-4 h-4 text-[#FFB040] shrink-0" />
             <div className="min-w-0">
@@ -273,9 +274,9 @@ export default function LuxuryResortHero({
           <button
             type="button"
             onClick={onBook}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[#FFB040] hover:bg-[#ffba59] active:scale-[0.98] text-[#1E3630] font-body font-bold text-xs uppercase tracking-wider shadow-lg transition duration-150 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+            className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#FFB040] hover:bg-[#ffba59] active:scale-[0.98] text-[#1E3630] font-body font-bold text-xs uppercase tracking-wider shadow-lg transition duration-150 shrink-0 flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
           >
-            Request Sanctuary Booking
+            <span>Booking</span>
           </button>
         </div>
       </div>
