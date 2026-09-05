@@ -54,12 +54,12 @@ export function IceShardOverlay({
   return (
     <div
       aria-label={`${activeStation.title} Station Overview`}
-      className={`fixed z-30 pointer-events-none top-1/2 -translate-y-1/2 flex items-center justify-center p-3 sm:p-6 transition-opacity duration-150 ${
+      className={`fixed z-30 pointer-events-none top-1/2 -translate-y-1/2 flex items-center justify-center p-3 sm:p-5 transition-opacity duration-150 ${
         isHero
           ? 'left-1/2 -translate-x-1/2'
           : side === 'left'
-          ? 'left-4 sm:left-10 lg:left-16'
-          : 'right-4 sm:right-10 lg:right-20'
+          ? 'left-1/2 -translate-x-[calc(50%+45px)]'
+          : 'left-1/2 -translate-x-[calc(50%-45px)]'
       }`}
       style={{
         opacity: entranceOpacity,
@@ -67,7 +67,7 @@ export function IceShardOverlay({
       }}
     >
       <div
-        className="relative w-[92vw] max-w-[880px] lg:max-w-[940px] h-[520px] sm:h-[460px]"
+        className="relative w-[90vw] max-w-[820px] lg:max-w-[850px] h-[500px] sm:h-[450px]"
         style={{
           transform: containerTransform,
           transformStyle: 'preserve-3d',
@@ -113,10 +113,10 @@ export function IceShardOverlay({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#2D4A43]/75 via-[#2D4A43]/10 to-transparent" />
               <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white drop-shadow-md">
-                <span className="font-label text-xs uppercase tracking-wider font-bold">
+                <span className="font-body text-xs uppercase tracking-wider font-bold">
                   {activeStation.subtitle}
                 </span>
-                <span className="font-label text-[10px] uppercase font-semibold text-[#FFB040]">
+                <span className="font-body text-[10px] uppercase font-semibold text-[#FFB040]">
                   {activeStation.tag}
                 </span>
               </div>
@@ -124,7 +124,7 @@ export function IceShardOverlay({
 
             <div className="md:col-span-6 flex flex-col justify-between h-full py-1 sm:py-2">
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#2D4A43] text-white text-[10px] font-label font-black tracking-widest uppercase shadow-sm">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#2D4A43] text-white text-[10px] font-body font-bold tracking-widest uppercase shadow-sm">
                   <Sparkles className="w-3 h-3 text-[#FFB040] fill-current" />
                   <span>{activeStation.tag}</span>
                 </div>
@@ -133,13 +133,13 @@ export function IceShardOverlay({
                   {activeStation.title}
                 </h2>
 
-                <p className="font-label font-bold text-xs sm:text-sm uppercase tracking-wider text-[#5C4033]">
+                <p className="font-body font-bold text-xs sm:text-sm uppercase tracking-wider text-[#5C4033]">
                   {activeStation.subtitle}
                 </p>
               </div>
 
               <div className="space-y-2 my-2 sm:my-3">
-                <div className="text-[10px] font-label font-black uppercase tracking-wider text-[#2D4A43]">
+                <div className="text-[10px] font-body font-bold uppercase tracking-wider text-[#2D4A43]">
                   Signature Highlights
                 </div>
                 <ul className="space-y-1.5 text-xs sm:text-sm font-body text-[#2D4A43]/95">
@@ -157,7 +157,7 @@ export function IceShardOverlay({
                   <button
                     type="button"
                     onClick={() => onNavigateNext && onNavigateNext(0.25)}
-                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-label font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-body font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
                   >
                     <span>{activeStation.ctaText}</span>
                     <ChevronDown className="w-4 h-4 text-[#FFB040] transition-transform duration-300 group-hover:translate-y-0.5" />
@@ -166,7 +166,7 @@ export function IceShardOverlay({
                   <button
                     type="button"
                     onClick={() => onSelectCabin && onSelectCabin(activeStation.cabinId)}
-                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-label font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
+                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-body font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
                   >
                     <Calendar className="w-4 h-4 text-[#FFB040]" />
                     <span>{activeStation.ctaText}</span>
