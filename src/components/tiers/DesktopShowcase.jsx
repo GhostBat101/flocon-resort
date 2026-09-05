@@ -10,7 +10,6 @@ import SceneContainer from '@/components/canvas/SceneContainer';
 import WebGLErrorBoundary from '@/components/canvas/WebGLErrorBoundary';
 import SkiLiftNav from '@/components/ui/SkiLiftNav';
 import AccessibilityOverlay from '@/components/canvas/AccessibilityOverlay';
-import SplatTransition from '@/components/canvas/SplatTransition';
 import ContentModal from '@/components/ui/ContentModal';
 import BookingController from '@/components/ui/BookingController';
 import IceShardOverlay from '@/components/ui/IceShardOverlay';
@@ -23,7 +22,6 @@ export function DesktopShowcase() {
   const containerRef = useRef(null);
   const [activeModalCabin, setActiveModalCabin] = useState(null);
   const [showBookingDesk, setShowBookingDesk] = useState(false);
-  const [splatActive, setSplatActive] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(0);
 
   const { curve, uRef, velocityRef } = useScrollSpline(containerRef);
@@ -32,7 +30,7 @@ export function DesktopShowcase() {
     toggleMute,
     updateMotion,
     playTelephoneRing,
-    playSnowSplat,
+    playCrystalChime,
     playSnowballLaunch,
   } = useAudioSystem();
 
@@ -86,12 +84,8 @@ export function DesktopShowcase() {
   }, [showBookingDesk, activeModalCabin]);
 
   const handleSelectCabin = (cabinId) => {
-    playSnowSplat();
-    setSplatActive(true);
-    setTimeout(() => {
-      setActiveModalCabin(cabinId);
-      setSplatActive(false);
-    }, 450);
+    playCrystalChime();
+    setActiveModalCabin(cabinId);
   };
 
   const handleActivatePhone = () => {
@@ -100,7 +94,7 @@ export function DesktopShowcase() {
   };
 
   const handleActivateLedger = () => {
-    playSnowSplat();
+    playCrystalChime();
     setShowBookingDesk(true);
   };
 
@@ -184,11 +178,6 @@ export function DesktopShowcase() {
           </p>
         </div>
 
-        <SplatTransition
-          isActive={splatActive}
-          onDismiss={() => setSplatActive(false)}
-        />
-
         {activeModalCabin && (
           <ContentModal
             cabinId={activeModalCabin}
@@ -210,7 +199,7 @@ export function DesktopShowcase() {
                 setShowBookingDesk(false);
               }
             }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fadeIn"
           >
             <BookingController
               initialCabinId={activeModalCabin || 'chalet-chamonix'}
