@@ -22,9 +22,10 @@ export default function LuxuryResortHero({
 
   const easeMelt = meltT * meltT * (3 - 2 * meltT);
   const heroOpacity = Math.max(0, 1 - Math.pow(easeMelt, 1.25));
-  const heroScale = 1.0 + easeMelt * 0.07;
-  const heroBlur = easeMelt * 16;
-  const maskRadius = easeMelt * 135;
+  const heroScale = 1.0 + easeMelt * 0.05;
+  const heroTranslateY = easeMelt * 35;
+  const heroBlur = easeMelt * 14;
+  const meltPercent = easeMelt * 108;
 
   if (isFullyMelted) {
     return null;
@@ -33,28 +34,28 @@ export default function LuxuryResortHero({
   return (
     <section
       aria-label="Flocon Alpine Resort Landing Sanctuary"
-      className="fixed inset-0 z-35 flex flex-col justify-between items-center select-none overflow-hidden"
+      className="fixed inset-0 z-35 flex flex-col justify-between items-center select-none overflow-hidden bg-[#0A1418]"
       style={{
         opacity: heroOpacity,
-        transform: `scale(${heroScale})`,
-        filter: `blur(${heroBlur}px)`,
-        maskImage: `radial-gradient(circle at 50% 50%, transparent ${maskRadius}%, black ${maskRadius + 32}%)`,
-        WebkitMaskImage: `radial-gradient(circle at 50% 50%, transparent ${maskRadius}%, black ${maskRadius + 32}%)`,
+        transform: `translate3d(0, ${heroTranslateY}px, 0) scale(${heroScale})`,
+        filter: `blur(${heroBlur}px) url(#ice-melt-turb)`,
+        maskImage: `linear-gradient(to bottom, transparent ${meltPercent}%, black ${meltPercent + 26}%)`,
+        WebkitMaskImage: `linear-gradient(to bottom, transparent ${meltPercent}%, black ${meltPercent + 26}%)`,
         pointerEvents: meltT > 0.6 ? 'none' : 'auto',
       }}
     >
       <svg className="sr-only" aria-hidden="true">
-        <filter id="ice-melt-turb">
+        <filter id="ice-melt-turb" x="-10%" y="-10%" width="120%" height="120%">
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.025"
+            baseFrequency="0.015 0.04"
             numOctaves="3"
             result="meltNoise"
           />
           <feDisplacementMap
             in="SourceGraphic"
             in2="meltNoise"
-            scale={easeMelt * 36}
+            scale={easeMelt * 52}
             xChannelSelector="R"
             yChannelSelector="G"
           />
