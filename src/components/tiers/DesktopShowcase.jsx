@@ -1,6 +1,6 @@
 /**
  * DesktopShowcase: Tier 1 flagship 3D experience with scroll-driven timeline, HUD, and audio.
- * Communicates with: SceneContainer.jsx, useScrollSpline.js, and useAudioSystem.js.
+ * Communicates with: SceneContainer.jsx, IceShardOverlay.jsx, useScrollSpline.js, and useAudioSystem.js.
  */
 
 'use client';
@@ -13,6 +13,7 @@ import AccessibilityOverlay from '@/components/canvas/AccessibilityOverlay';
 import SplatTransition from '@/components/canvas/SplatTransition';
 import ContentModal from '@/components/ui/ContentModal';
 import BookingController from '@/components/ui/BookingController';
+import IceShardOverlay from '@/components/ui/IceShardOverlay';
 import { useScrollSpline } from '@/hooks/useScrollSpline';
 import { useAudioSystem } from '@/hooks/useAudioSystem';
 import { Volume2, VolumeX, Sparkles } from 'lucide-react';
@@ -164,7 +165,13 @@ export function DesktopShowcase() {
           </a>
         </header>
 
-        <div className="absolute bottom-6 left-6 z-30 pointer-events-none max-w-sm p-4 rounded-2xl bg-[#F3F7F9]/85 backdrop-blur-md border border-white/60 shadow-lg text-[#2D4A43]">
+        <IceShardOverlay
+          progress={currentProgress}
+          onSelectCabin={handleSelectCabin}
+          onNavigateNext={handleNavigateSpline}
+        />
+
+        <div className={`absolute bottom-6 left-6 z-30 pointer-events-none max-w-sm p-4 rounded-2xl bg-[#F3F7F9]/85 backdrop-blur-md border border-white/60 shadow-lg text-[#2D4A43] transition-opacity duration-300 ${currentProgress < 0.18 ? 'opacity-0' : 'opacity-100'}`}>
           <div className="flex items-center gap-2 text-xs font-label font-bold text-[#FFB040] uppercase tracking-wider mb-1">
             <Sparkles className="w-3.5 h-3.5 fill-current" />
             <span>Descent Altitude</span>
