@@ -7,6 +7,7 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { EffectComposer, N8AO } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import MountainSlope from './MountainSlope';
 import Forest from './Forest';
@@ -19,6 +20,8 @@ import EnvironmentLighting from './EnvironmentLighting';
 import SplineCameraController from './SplineCameraController';
 import { isWebGLAvailable } from '@/utils/webgl';
 import { CABINS } from '@/data/cabins';
+
+const AO_COLOR = new THREE.Color('#0F1D24');
 
 export default function SceneContainer({
   progress = 0,
@@ -96,6 +99,20 @@ export default function SceneContainer({
             onActivatePhone={onActivatePhone}
             onActivateLedger={onActivateLedger}
           />
+
+          <EffectComposer multisampling={0}>
+            <N8AO
+              aoRadius={2.4}
+              distanceFalloff={0.25}
+              intensity={2.2}
+              aoSamples={8}
+              denoiseSamples={4}
+              denoiseRadius={10}
+              color={AO_COLOR}
+              quality="low"
+              halfRes
+            />
+          </EffectComposer>
         </Suspense>
       </Canvas>
     </div>
