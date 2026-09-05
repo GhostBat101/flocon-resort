@@ -109,4 +109,18 @@ STATIONS.forEach((station, index) => {
   assert.ok(fs.existsSync(publicImagePath), `Image file missing: ${publicImagePath}`);
 });
 
+const calculateMeltProgress = (u) => Math.min(1, Math.max(0, u / 0.075));
+assert.strictEqual(calculateMeltProgress(0), 0);
+assert.strictEqual(calculateMeltProgress(0.0375), 0.5);
+assert.strictEqual(calculateMeltProgress(0.075), 1);
+assert.strictEqual(calculateMeltProgress(0.25), 1);
+
+const calculateMorphProgress = (u) => Math.min(1, Math.max(0, u / 0.065));
+const cubicEase = (t) => t * t * (3 - 2 * t);
+assert.strictEqual(cubicEase(0), 0);
+assert.strictEqual(cubicEase(1), 1);
+assert.strictEqual(cubicEase(0.5), 0.5);
+assert.ok(cubicEase(0.2) < 0.2);
+assert.ok(cubicEase(0.8) > 0.8);
+
 console.log('✅ All terrain elevation models, camera stability matrices, station thresholds, and booking generators verified successfully.');
