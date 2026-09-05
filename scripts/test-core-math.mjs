@@ -123,4 +123,19 @@ assert.strictEqual(cubicEase(0.5), 0.5);
 assert.ok(cubicEase(0.2) < 0.2);
 assert.ok(cubicEase(0.8) > 0.8);
 
+const calculateContainerGeometry = (ease) => ({
+  width: 530 * (1 - ease) + 154 * ease,
+  height: 44 * (1 - ease) + 256 * ease,
+  right: 180 * (1 - ease) + 24 * ease,
+});
+const startGeo = calculateContainerGeometry(0);
+assert.strictEqual(startGeo.width, 530);
+assert.strictEqual(startGeo.height, 44);
+assert.strictEqual(startGeo.right, 180);
+
+const endGeo = calculateContainerGeometry(1);
+assert.strictEqual(endGeo.width, 154);
+assert.strictEqual(endGeo.height, 256);
+assert.strictEqual(endGeo.right, 24);
+
 console.log('✅ All terrain elevation models, camera stability matrices, station thresholds, and booking generators verified successfully.');
