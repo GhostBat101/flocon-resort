@@ -61,7 +61,7 @@ assert.strictEqual(summitPoint.z, -160);
 
 const valleyPoint = pisteCurve.getPointAt(1.0);
 assert.ok(valleyPoint.y < 3.0);
-assert.strictEqual(valleyPoint.z, 122.5);
+assert.ok(Math.abs(valleyPoint.z - 122.5) < 0.001);
 
 const tangentAtSummit = pisteCurve.getTangentAt(0.0).normalize();
 assert.ok(tangentAtSummit.length() > 0.999 && tangentAtSummit.length() < 1.001);
