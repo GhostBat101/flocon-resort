@@ -10,14 +10,57 @@ import * as THREE from 'three';
 import { getAlpineElevation } from '@/utils/terrain';
 
 const SNOW_COLOR = '#F3F7F9';
-const PISTE_COLOR = '#E0EDF4';
+const PISTE_COLOR = '#DFEDF5';
 const ROCK_COLOR = '#8FA3AE';
 const POLE_COLOR = '#263238';
 const FLAG_COLOR = '#FF8F00';
 
+const CROSS_OFFSETS = [-1.0, -0.65, -0.28, 0.0, 0.28, 0.65, 1.0];
+const PISTE_HALF_WIDTH = 5.4;
+
+function createSkiTrackBumpTexture() {
+  const width = 256;
+  const height = 512;
+  const size = width * height;
+  const data = new Uint8Array(4 * size);
+
+  for (let y = 0; y < height; y += 1) {
+    const v = y / height;
+    for (let x = 0; x < width; x += 1) {
+      const u = x / width;
+      const index = (y * width + x) * 4;
+
+      const corduroy = 0.5 + 0.5 * Math.sin(u * Math.PI * 2 * 26);
+
+      const track1 = Math.exp(-Math.pow((u - 0.28 - Math.sin(v * 16) * 0.03) * 35, 2));
+      const track2 = Math.exp(-Math.pow((u - 0.32 - Math.sin(v * 16) * 0.03) * 35, 2));
+      const track3 = Math.exp(-Math.pow((u - 0.68 + Math.cos(v * 14) * 0.03) * 35, 2));
+      const track4 = Math.exp(-Math.pow((u - 0.72 + Math.cos(v * 14) * 0.03) * 35, 2));
+      const skiRuts = (track1 + track2 + track3 + track4) * 0.45;
+
+      const bump = Math.min(1.0, Math.max(0.0, corduroy * 0.28 + (1.0 - skiRuts) * 0.72));
+      const val = Math.floor(bump * 255);
+
+      data[index] = val;
+      data[index + 1] = val;
+      data[index + 2] = val;
+      data[index + 3] = 255;
+    }
+  }
+
+  const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 40);
+  texture.needsUpdate = true;
+  return texture;
+}
+
 export default function MountainSlope({ curve }) {
+  const skiTrackBumpMap = useMemo(() => createSkiTrackBumpTexture(), []);
+
   const terrainGeometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(300, 380, 72, 96);
+    const geo = new THREE.PlaneGeometry(300, 380, 120, 160);
     geo.rotateX(-Math.PI / 2);
     geo.translate(0, 0, -20);
 
@@ -37,7 +80,7 @@ export default function MountainSlope({ curve }) {
     if (!curve) return null;
 
     const divisions = 240;
-    const pisteHalfWidth = 5.4;
+    const numCross = CROSS_OFFSETS.length;
     const positions = [];
     const uvs = [];
     const indices = [];
@@ -49,24 +92,29 @@ export default function MountainSlope({ curve }) {
       const tangent = curve.getTangentAt(t).normalize();
       const binormal = new THREE.Vector3().crossVectors(tangent, upVector).normalize();
 
-      const leftX = point.x + binormal.x * pisteHalfWidth;
-      const leftZ = point.z + binormal.z * pisteHalfWidth;
-      const leftY = getAlpineElevation(leftX, leftZ) + 0.05;
+      for (let c = 0; c < numCross; c += 1) {
+        const offsetRatio = CROSS_OFFSETS[c];
+        const px = point.x + binormal.x * offsetRatio * PISTE_HALF_WIDTH;
+        const pz = point.z + binormal.z * offsetRatio * PISTE_HALF_WIDTH;
+        const py = getAlpineElevation(px, pz) + 0.03;
 
-      const rightX = point.x - binormal.x * pisteHalfWidth;
-      const rightZ = point.z - binormal.z * pisteHalfWidth;
-      const rightY = getAlpineElevation(rightX, rightZ) + 0.05;
-
-      positions.push(leftX, leftY, leftZ);
-      positions.push(rightX, rightY, rightZ);
-
-      uvs.push(0, t * 20);
-      uvs.push(1, t * 20);
+        positions.push(px, py, pz);
+        uvs.push((offsetRatio + 1) * 0.5, t * 40);
+      }
 
       if (i < divisions) {
-        const base = i * 2;
-        indices.push(base, base + 1, base + 2);
-        indices.push(base + 1, base + 3, base + 2);
+        const rowCurrent = i * numCross;
+        const rowNext = (i + 1) * numCross;
+
+        for (let c = 0; c < numCross - 1; c += 1) {
+          const a = rowCurrent + c;
+          const b = rowCurrent + c + 1;
+          const d = rowNext + c;
+          const e = rowNext + c + 1;
+
+          indices.push(a, b, d);
+          indices.push(b, e, d);
+        }
       }
     }
 
@@ -127,9 +175,11 @@ export default function MountainSlope({ curve }) {
         <mesh geometry={pisteGeometry} receiveShadow>
           <meshStandardMaterial
             color={PISTE_COLOR}
-            roughness={0.75}
-            metalness={0.05}
-            flatShading
+            roughness={0.72}
+            metalness={0.03}
+            bumpMap={skiTrackBumpMap}
+            bumpScale={0.07}
+            flatShading={false}
           />
         </mesh>
       )}
