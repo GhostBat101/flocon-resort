@@ -94,16 +94,16 @@ export function BookingController({
       {isLaunching && (
         <div className="absolute inset-0 z-20 rounded-2xl bg-[#2D4A43]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-[#F3F7F9]">
           <div className="relative mb-4 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-white shadow-2xl animate-ping opacity-60" />
-            <div className="absolute w-14 h-14 rounded-full bg-gradient-to-tr from-[#D6E4EB] to-white border-2 border-white/80 shadow-inner animate-bounce flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-white shadow-2xl animate-ping opacity-50" />
+            <div className="absolute w-14 h-14 rounded-full bg-gradient-to-tr from-[#D6E4EB] to-white border-2 border-white/80 shadow-inner flex items-center justify-center">
               <Mail className="w-6 h-6 text-[#2D4A43]" />
             </div>
           </div>
           <p className="font-headline font-black text-xl text-white mb-1">
-            Launching Snowball...
+            Dispatching Concierge Inquiry...
           </p>
           <p className="font-label text-xs uppercase tracking-wider text-[#FFB040]">
-            Packing inquiry code {generatedCode}
+            Dossier reference {generatedCode}
           </p>
         </div>
       )}
@@ -189,9 +189,10 @@ export function BookingController({
               type="date"
               name="checkIn"
               required
+              min="2026-09-06"
               value={formData.checkIn}
               onChange={handleInputChange}
-              className="w-full h-11 px-3 rounded-xl bg-white border border-[#9EBBC9]/50 text-xs font-body text-[#2D4A43] focus:outline-none focus:ring-2 focus:ring-[#2D4A43]"
+              className="w-full h-11 px-3 rounded-xl bg-white border border-[#9EBBC9]/50 text-xs font-body text-[#2D4A43] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
             />
           </div>
           <div>
@@ -202,9 +203,10 @@ export function BookingController({
               type="date"
               name="checkOut"
               required
+              min={formData.checkIn || '2026-09-06'}
               value={formData.checkOut}
               onChange={handleInputChange}
-              className="w-full h-11 px-3 rounded-xl bg-white border border-[#9EBBC9]/50 text-xs font-body text-[#2D4A43] focus:outline-none focus:ring-2 focus:ring-[#2D4A43]"
+              className="w-full h-11 px-3 rounded-xl bg-white border border-[#9EBBC9]/50 text-xs font-body text-[#2D4A43] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
             />
           </div>
         </div>
