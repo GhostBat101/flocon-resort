@@ -71,7 +71,8 @@ export default function SceneContainer({
         }}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
-        <fogExp2 attach="fog" args={['#E0EBF2', 0.0085]} />
+        <color attach="background" args={['#D8E8F5']} />
+        <fogExp2 attach="fog" args={['#D8E8F5', 0.0075]} />
         <Suspense fallback={null}>
           <EnvironmentLighting progress={progress} />
           {curve && <SplineCameraController curve={curve} targetProgress={progress} />}
