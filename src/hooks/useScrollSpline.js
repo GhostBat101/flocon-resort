@@ -25,6 +25,8 @@ const PISTE_WAYPOINTS = [
 export function useScrollSpline(triggerRef) {
   const uRef = useRef(0.0);
   const velocityRef = useRef(0.0);
+  const lastURef = useRef(0.0);
+  const lastTimeRef = useRef(Date.now());
 
   const curve = useMemo(() => {
     const points = PISTE_WAYPOINTS.map(([x, z]) => {
@@ -52,11 +54,14 @@ export function useScrollSpline(triggerRef) {
           start: 'top top',
           end: 'bottom bottom',
           scrub: 1.5,
-          onUpdate: (self) => {
-            velocityRef.current = self.getVelocity();
-          },
         },
         onUpdate: () => {
+          const now = Date.now();
+          const dt = Math.max(0.001, (now - lastTimeRef.current) / 1000);
+          const deltaU = Math.abs(proxy.u - lastURef.current);
+          velocityRef.current = deltaU / dt;
+          lastURef.current = proxy.u;
+          lastTimeRef.current = now;
           uRef.current = proxy.u;
         },
       });
@@ -64,6 +69,11 @@ export function useScrollSpline(triggerRef) {
 
     return () => ctx.revert();
   }, [triggerRef]);
+
+  const getVelocity = () => {
+    const isStationary = Date.now() - lastTimeRef.current > 70;
+    return isStationary ? 0 : velocityRef.current;
+  };
 
   const getTrackMetrics = (progressValue = uRef.current) => {
     const clampedU = Math.max(0, Math.min(0.999, progressValue));
@@ -74,7 +84,7 @@ export function useScrollSpline(triggerRef) {
       u: clampedU,
       position,
       tangent,
-      velocity: velocityRef.current,
+      velocity: getVelocity(),
     };
   };
 
@@ -82,6 +92,7 @@ export function useScrollSpline(triggerRef) {
     curve,
     uRef,
     velocityRef,
+    getVelocity,
     getTrackMetrics,
     getSnowballMetrics: getTrackMetrics,
   };
