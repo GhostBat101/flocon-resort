@@ -1,5 +1,5 @@
 /**
- * Forest: Instanced multi-species alpine forest and winter bushes grounded to mountain terrain.
+ * Forest: Instanced authentic alpine evergreen forest and snow bushes grounded to mountain terrain.
  * Communicates with: SceneContainer.jsx, MountainSlope.jsx, useScrollSpline.js, and terrain.js.
  */
 
@@ -16,16 +16,15 @@ const DUMMY = new THREE.Object3D();
 const UP_VECTOR = new THREE.Vector3(0, 1, 0);
 
 const TREE_COUNTS = {
-  tieredPine: 160,
-  slenderFir: 140,
-  twistedPine: 110,
-  deadWinter: 70,
+  classicPine: 160,
+  slenderFir: 150,
+  dwarfPine: 110,
+  windwardSpruce: 100,
 };
 
 const BUSH_COUNTS = {
-  snowMound: 90,
-  bareTwig: 80,
-  alpineScrub: 70,
+  alpineMound: 110,
+  alpineShrub: 110,
 };
 
 function createPlantData(curve, count, minOffset, maxOffset, minScale, maxScale, tiltFactor) {
@@ -117,45 +116,40 @@ function PlantTypeInstances({ modelGroup, instances }) {
 export default function Forest({ curve }) {
   const { nodes } = useGLTF(FOLIAGE_MODEL_PATH);
 
-  const tieredPineInstances = useMemo(
-    () => createPlantData(curve, TREE_COUNTS.tieredPine, 8.0, 62.0, 0.85, 1.4, 0.08),
+  const classicPineInstances = useMemo(
+    () => createPlantData(curve, TREE_COUNTS.classicPine, 8.0, 62.0, 0.85, 1.35, 0.08),
     [curve]
   );
   const slenderFirInstances = useMemo(
-    () => createPlantData(curve, TREE_COUNTS.slenderFir, 7.5, 55.0, 0.9, 1.45, 0.07),
+    () => createPlantData(curve, TREE_COUNTS.slenderFir, 7.5, 55.0, 0.90, 1.40, 0.07),
     [curve]
   );
-  const twistedPineInstances = useMemo(
-    () => createPlantData(curve, TREE_COUNTS.twistedPine, 11.0, 68.0, 0.8, 1.35, 0.12),
+  const dwarfPineInstances = useMemo(
+    () => createPlantData(curve, TREE_COUNTS.dwarfPine, 10.0, 65.0, 0.80, 1.25, 0.09),
     [curve]
   );
-  const deadWinterInstances = useMemo(
-    () => createPlantData(curve, TREE_COUNTS.deadWinter, 9.0, 65.0, 0.75, 1.3, 0.14),
+  const windwardSpruceInstances = useMemo(
+    () => createPlantData(curve, TREE_COUNTS.windwardSpruce, 9.0, 60.0, 0.85, 1.30, 0.10),
     [curve]
   );
 
-  const snowMoundInstances = useMemo(
-    () => createPlantData(curve, BUSH_COUNTS.snowMound, 4.5, 45.0, 0.7, 1.3, 0.08),
+  const alpineMoundInstances = useMemo(
+    () => createPlantData(curve, BUSH_COUNTS.alpineMound, 4.5, 45.0, 0.70, 1.25, 0.08),
     [curve]
   );
-  const bareTwigInstances = useMemo(
-    () => createPlantData(curve, BUSH_COUNTS.bareTwig, 5.0, 48.0, 0.65, 1.25, 0.1),
-    [curve]
-  );
-  const alpineScrubInstances = useMemo(
-    () => createPlantData(curve, BUSH_COUNTS.alpineScrub, 4.0, 42.0, 0.7, 1.3, 0.08),
+  const alpineShrubInstances = useMemo(
+    () => createPlantData(curve, BUSH_COUNTS.alpineShrub, 4.0, 42.0, 0.75, 1.30, 0.08),
     [curve]
   );
 
   return (
     <group>
-      <PlantTypeInstances modelGroup={nodes.Tree_Pine_Tiered} instances={tieredPineInstances} />
+      <PlantTypeInstances modelGroup={nodes.Tree_Pine_Classic} instances={classicPineInstances} />
       <PlantTypeInstances modelGroup={nodes.Tree_Fir_Slender} instances={slenderFirInstances} />
-      <PlantTypeInstances modelGroup={nodes.Tree_Pine_Twisted} instances={twistedPineInstances} />
-      <PlantTypeInstances modelGroup={nodes.Tree_Dead_Winter} instances={deadWinterInstances} />
-      <PlantTypeInstances modelGroup={nodes.Bush_Snow_Mound} instances={snowMoundInstances} />
-      <PlantTypeInstances modelGroup={nodes.Bush_Bare_Twig} instances={bareTwigInstances} />
-      <PlantTypeInstances modelGroup={nodes.Bush_Alpine_Scrub} instances={alpineScrubInstances} />
+      <PlantTypeInstances modelGroup={nodes.Tree_Pine_Dwarf} instances={dwarfPineInstances} />
+      <PlantTypeInstances modelGroup={nodes.Tree_Spruce_Windward} instances={windwardSpruceInstances} />
+      <PlantTypeInstances modelGroup={nodes.Bush_Alpine_Mound} instances={alpineMoundInstances} />
+      <PlantTypeInstances modelGroup={nodes.Bush_Alpine_Shrub} instances={alpineShrubInstances} />
     </group>
   );
 }
