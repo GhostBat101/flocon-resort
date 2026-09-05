@@ -157,16 +157,16 @@ export function IceShardOverlay({
                   <button
                     type="button"
                     onClick={() => onNavigateNext && onNavigateNext(0.25)}
-                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-label font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl transition"
+                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-label font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
                   >
                     <span>{activeStation.ctaText}</span>
-                    <ChevronDown className="w-4 h-4 text-[#FFB040] animate-bounce" />
+                    <ChevronDown className="w-4 h-4 text-[#FFB040] transition-transform duration-300 group-hover:translate-y-0.5" />
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={() => onSelectCabin && onSelectCabin(activeStation.cabinId)}
-                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-label font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition"
+                    className="pointer-events-auto w-full py-3.5 px-5 rounded-xl bg-[#2D4A43] hover:bg-[#2D4A43]/90 text-[#F3F7F9] font-label font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040]"
                   >
                     <Calendar className="w-4 h-4 text-[#FFB040]" />
                     <span>{activeStation.ctaText}</span>
