@@ -1,12 +1,13 @@
 /**
  * MorphingHeaderSkiLift: Single unified container morphing from traditional website header to right ski lift HUD.
- * Communicates with: DesktopShowcase.jsx, useScrollSpline.js, cabins.js, and globals.css.
+ * Communicates with: DesktopShowcase.jsx, FloconLogo.jsx, cabins.js, and globals.css.
  */
 
 'use client';
 
 import React from 'react';
-import { Mountain, Compass, Home, PhoneCall, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Mountain, Compass, Home, PhoneCall, Volume2, VolumeX } from 'lucide-react';
+import FloconLogo from '@/components/ui/FloconLogo';
 import { RESORT_FACTS } from '@/data/cabins';
 
 const SECTIONS = [
@@ -52,8 +53,8 @@ export default function MorphingHeaderSkiLift({
           aria-label="Return to Flocon Summit Sanctuary"
           className="flex items-center gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB040] rounded-2xl"
         >
-          <div className="w-9 h-9 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-sm">
-            <Sparkles className="w-4 h-4 text-[#FFB040]" />
+          <div className="w-9 h-9 rounded-2xl bg-[#0D1B1E]/60 backdrop-blur-md border border-white/25 flex items-center justify-center shadow-sm p-1">
+            <FloconLogo className="w-full h-full" />
           </div>
           <div>
             <span className="font-headline font-black text-lg tracking-wider text-[#F3F7F9] uppercase block leading-none drop-shadow-sm">
